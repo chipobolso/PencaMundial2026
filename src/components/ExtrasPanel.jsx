@@ -1,36 +1,73 @@
 import { useEffect, useState } from "react"
-import { getUserExtras, saveUserExtras } from "../services/extras"
-import { teams } from "../data/fixtures"
+import { saveUserExtras, getUserExtras } from "../services/extras"
 
 function ExtrasPanel({ user }) {
   const [champion, setChampion] = useState("")
   const [topScorer, setTopScorer] = useState("")
   const [saved, setSaved] = useState(false)
+  const [isLocked, setIsLocked] = useState(false)
 
-  const firstMatchDate = new Date("2026-06-11T16:00:00-03:00")
-  const lockTime = new Date(firstMatchDate.getTime() - 15 * 60 * 1000)
-  const isLocked = new Date() >= lockTime
+  function parseMatchDate(dateText, timeText) {
+    const months = {
+      Enero: 0,
+      Febrero: 1,
+      Marzo: 2,
+      Abril: 3,
+      Mayo: 4,
+      Junio: 5,
+      Julio: 6,
+      Agosto: 7,
+      Septiembre: 8,
+      Octubre: 9,
+      Noviembre: 10,
+      Diciembre: 11
+    }
+
+    const [day, monthName, year] = dateText.split(" ")
+    const [hour, minute] = timeText.split(":")
+
+    return new Date(
+      Number(year),
+      months[monthName],
+      Number(day),
+      Number(hour),
+      Number(minute)
+    )
+  }
 
   useEffect(() => {
     async function loadExtras() {
-      const extras = await getUserExtras(user.uid)
+      const data = await getUserExtras(user.uid)
 
-      if (extras) {
-        setChampion(extras.champion || "")
-        setTopScorer(extras.topScorer || "")
+      if (data) {
+        setChampion(data.champion || "")
+        setTopScorer(data.topScorer || "")
+        setSaved(true)
       }
     }
 
     loadExtras()
   }, [user.uid])
 
-  async function handleSave(e) {
-    e.preventDefault()
+  useEffect(() => {
+    const firstMatch = parseMatchDate("11 Junio 2026", "16:00")
+    const lockTime = new Date(firstMatch.getTime() - 15 * 60 * 1000)
 
-    if (isLocked) {
-      alert("Los extras ya están cerrados.")
-      return
+    function checkLock() {
+      if (new Date() >= lockTime) {
+        setIsLocked(true)
+      }
     }
+
+    checkLock()
+
+    const interval = setInterval(checkLock, 1000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  async function handleSave() {
+    if (isLocked) return
 
     await saveUserExtras(user.uid, {
       champion,
@@ -38,90 +75,74 @@ function ExtrasPanel({ user }) {
     })
 
     setSaved(true)
-
-    setTimeout(() => {
-      setSaved(false)
-    }, 2500)
   }
 
   return (
-    <div className="bg-slate-900 rounded-3xl p-6 border border-slate-800 shadow-2xl mb-10">
-      <div className="flex justify-between items-start gap-4 mb-2">
-        <h2 className="text-3xl font-black">
-          ⭐ Extras
-        </h2>
+    <div className="bg-slate-900 rounded-3xl p-5 md:p-6 border border-slate-800 shadow-2xl max-w-2xl mx-auto">
 
-        {isLocked ? (
-          <div className="bg-gray-500/20 border border-gray-500 text-gray-300 px-3 py-1 rounded-xl text-xs font-bold">
-            🔒 CERRADO
-          </div>
-        ) : (
-          <div className="bg-green-500/20 border border-green-500 text-green-300 px-3 py-1 rounded-xl text-xs font-bold">
-            ABIERTO
-          </div>
-        )}
-      </div>
+      <h2 className="text-2xl md:text-3xl font-black mb-4 text-center">
+        ⭐ Extras
+      </h2>
 
-      <p className="text-slate-400 mb-6">
-        Campeón suma 20 puntos. Goleador suma 15 puntos. Se bloquean 15 minutos antes del primer partido.
+      <p className="text-slate-400 text-sm text-center mb-6">
+        Elegí el campeón del mundo y el goleador del torneo.
       </p>
 
-      <form onSubmit={handleSave} className="grid md:grid-cols-3 gap-4 items-end">
+      {isLocked && (
+        <div className="bg-red-500/10 border border-red-500 text-red-300 p-3 rounded-xl mb-5 text-center text-sm font-bold">
+          🔒 Pronósticos cerrados
+        </div>
+      )}
+
+      <div className="space-y-4">
 
         <div>
-          <label className="block text-slate-400 mb-2">
-            Campeón del Mundial
+          <label className="text-sm text-slate-400 block mb-1">
+            Campeón
           </label>
 
-          <select
+          <input
+            type="text"
             value={champion}
-            disabled={isLocked}
             onChange={(e) => setChampion(e.target.value)}
-            className="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 disabled:opacity-50"
-            required
-          >
-            <option value="">Seleccionar campeón</option>
-
-            {teams.map((team) => (
-              <option key={team} value={team}>
-                {team}
-              </option>
-            ))}
-          </select>
+            disabled={isLocked}
+            className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-blue-500 disabled:opacity-50"
+            placeholder="Ej: Argentina"
+          />
         </div>
 
         <div>
-          <label className="block text-slate-400 mb-2">
-            Goleador del Mundial
+          <label className="text-sm text-slate-400 block mb-1">
+            Goleador
           </label>
 
           <input
             type="text"
             value={topScorer}
-            disabled={isLocked}
             onChange={(e) => setTopScorer(e.target.value)}
+            disabled={isLocked}
+            className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-blue-500 disabled:opacity-50"
             placeholder="Ej: Mbappé"
-            className="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 disabled:opacity-50"
-            required
           />
         </div>
 
         {!isLocked && (
           <button
-            type="submit"
-            className="bg-purple-600 hover:bg-purple-500 p-4 rounded-xl font-black"
+            onClick={handleSave}
+            className="w-full bg-blue-600 hover:bg-blue-500 p-3 rounded-xl font-black mt-3"
           >
-            Guardar extras
+            {saved ? "Modificar" : "Guardar"}
           </button>
         )}
 
-      </form>
+        {saved && (
+          <div className="text-green-400 text-center text-sm mt-2">
+            ✔ Guardado correctamente
+          </div>
+        )}
 
-      {saved && (
-        <div className="mt-4 bg-green-500/20 border border-green-500 text-green-300 rounded-xl p-3 font-bold">
-          Extras guardados ✔
-        </div>
-      )}
+      </div>
+
     </div>
   )
 }

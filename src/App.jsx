@@ -159,19 +159,31 @@ function App() {
         <div className="sticky top-0 z-50 bg-slate-950/95 backdrop-blur border border-slate-800 rounded-3xl p-3 md:p-4 mb-5 md:mb-6 shadow-2xl overflow-x-auto">
           <div className="flex gap-2 min-w-max">
 
-            <button onClick={() => setActiveTab("inicio")} className={`${tabClass("inicio")} px-4 py-2 rounded-xl font-black text-sm`}>
+            <button
+              onClick={() => setActiveTab("inicio")}
+              className={`${tabClass("inicio")} px-4 py-2 rounded-xl font-black text-sm`}
+            >
               Inicio
             </button>
 
-            <button onClick={() => setActiveTab("ranking")} className={`${tabClass("ranking")} px-4 py-2 rounded-xl font-black text-sm`}>
+            <button
+              onClick={() => setActiveTab("ranking")}
+              className={`${tabClass("ranking")} px-4 py-2 rounded-xl font-black text-sm`}
+            >
               Ranking
             </button>
 
-            <button onClick={() => setActiveTab("extras")} className={`${tabClass("extras")} px-4 py-2 rounded-xl font-black text-sm`}>
+            <button
+              onClick={() => setActiveTab("extras")}
+              className={`${tabClass("extras")} px-4 py-2 rounded-xl font-black text-sm`}
+            >
               Extras
             </button>
 
-            <button onClick={() => setActiveTab("historial")} className={`${tabClass("historial")} px-4 py-2 rounded-xl font-black text-sm`}>
+            <button
+              onClick={() => setActiveTab("historial")}
+              className={`${tabClass("historial")} px-4 py-2 rounded-xl font-black text-sm`}
+            >
               Pronósticos
             </button>
 
@@ -186,7 +198,10 @@ function App() {
             ))}
 
             {user.email === adminEmail && (
-              <button onClick={() => setActiveTab("admin")} className={`${tabClass("admin")} px-4 py-2 rounded-xl font-black text-sm`}>
+              <button
+                onClick={() => setActiveTab("admin")}
+                className={`${tabClass("admin")} px-4 py-2 rounded-xl font-black text-sm`}
+              >
                 Admin
               </button>
             )}
@@ -196,7 +211,10 @@ function App() {
 
         {activeTab === "inicio" && (
           <>
-            <ProgressPanel completed={completedPredictions} total={allMatchesBase.length} />
+            <ProgressPanel
+              completed={completedPredictions}
+              total={allMatchesBase.length}
+            />
 
             <PrizesPanel participantsCount={ranking.length} />
 
@@ -247,7 +265,13 @@ function App() {
         )}
 
         {activeTab === "historial" && (
-          <PredictionsHistory matches={allMatchesBase} />
+          <PredictionsHistory
+            matches={allMatchesBase}
+            user={user}
+            calculateMatchPoints={calculateMatchPoints}
+            matchResults={matchResults}
+            showToast={showToast}
+          />
         )}
 
         {Object.entries(groups).map(([groupName, matches]) => (
@@ -268,9 +292,14 @@ function App() {
           <>
             <AdminUsersPanel />
 
-            <AdminPanel matches={allMatchesBase} refreshResults={refreshResults} />
+            <AdminPanel
+              matches={allMatchesBase}
+              refreshResults={refreshResults}
+            />
 
-            <AdminExtrasPanel refreshResults={refreshResults} />
+            <AdminExtrasPanel
+              refreshResults={refreshResults}
+            />
           </>
         )}
 
