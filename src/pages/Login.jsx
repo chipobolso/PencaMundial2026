@@ -32,80 +32,139 @@ function Login({ onLogin }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-slate-900 p-10 rounded-3xl w-full max-w-md shadow-2xl border border-slate-800"
-      >
-        <h2 className="text-4xl font-black mb-8 text-center">
-          {isRegister ? "Registrarse" : "Iniciar sesión"}
-        </h2>
+    <div className="min-h-screen bg-slate-950 text-white px-4 py-8 flex items-center justify-center">
 
-        {isRegister && (
-          <>
-            <input
-              type="text"
-              placeholder="Nombre"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full mb-4 p-4 rounded-xl bg-slate-800 border border-slate-700"
-              required
-            />
+      <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
 
-            <input
-              type="text"
-              placeholder="Apellido"
-              value={lastname}
-              onChange={(e) => setLastname(e.target.value)}
-              className="w-full mb-4 p-4 rounded-xl bg-slate-800 border border-slate-700"
-              required
-            />
-          </>
-        )}
+        <div className="bg-gradient-to-br from-blue-700 via-sky-700 to-slate-900 rounded-3xl p-8 md:p-10 shadow-2xl border border-blue-400/30">
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full mb-4 p-4 rounded-xl bg-slate-800 border border-slate-700"
-          required
-        />
-
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full mb-6 p-4 rounded-xl bg-slate-800 border border-slate-700"
-          required
-        />
-
-        <button
-          type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-black"
-        >
-          {isRegister ? "Crear usuario" : "Ingresar"}
-        </button>
-
-        {message && (
-          <div className="mt-5 text-center text-slate-300 bg-slate-800 rounded-xl p-3">
-            {message}
+          <div className="text-7xl md:text-8xl mb-6">
+            🏆
           </div>
-        )}
 
-        <p
-          className="text-center mt-6 cursor-pointer text-slate-400"
-          onClick={() => {
-            setIsRegister(!isRegister)
-            setMessage("")
-          }}
+          <h1 className="text-4xl md:text-6xl font-black leading-tight mb-4">
+            PENCA MUNDIAL 2026
+          </h1>
+
+          <p className="text-xl md:text-2xl text-slate-100 font-bold mb-6">
+            Estados Unidos · Canadá · México
+          </p>
+
+          <div className="grid grid-cols-3 gap-3 mb-8">
+            <div className="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
+              <div className="text-2xl mb-1">🇺🇸</div>
+              <div className="text-xs font-bold">EEUU</div>
+            </div>
+
+            <div className="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
+              <div className="text-2xl mb-1">🇨🇦</div>
+              <div className="text-xs font-bold">Canadá</div>
+            </div>
+
+            <div className="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
+              <div className="text-2xl mb-1">🇲🇽</div>
+              <div className="text-xs font-bold">México</div>
+            </div>
+          </div>
+
+          <div className="space-y-3 text-sm md:text-base text-slate-200">
+            <div className="bg-black/20 rounded-2xl p-4">
+              ⚽ Completá tus pronósticos de la fase de grupos.
+            </div>
+
+            <div className="bg-black/20 rounded-2xl p-4">
+              🔒 Cada partido se bloquea 15 minutos antes del inicio.
+            </div>
+
+            <div className="bg-black/20 rounded-2xl p-4">
+              🏆 Ranking, premios, campeón y goleador incluidos.
+            </div>
+          </div>
+
+        </div>
+
+        <form
+          onSubmit={handleSubmit}
+          className="bg-slate-900 p-8 md:p-10 rounded-3xl w-full shadow-2xl border border-slate-800"
         >
-          {isRegister
-            ? "Ya tenés cuenta? Iniciar sesión"
-            : "No tenés cuenta? Registrate"}
-        </p>
-      </form>
+          <h2 className="text-3xl md:text-4xl font-black mb-2 text-center">
+            {isRegister ? "Crear cuenta" : "Iniciar sesión"}
+          </h2>
+
+          <p className="text-slate-400 text-center mb-8">
+            {isRegister
+              ? "Registrate y esperá aprobación del administrador."
+              : "Ingresá para completar tus pronósticos."}
+          </p>
+
+          {isRegister && (
+            <>
+              <input
+                type="text"
+                placeholder="Nombre"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full mb-4 p-4 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-blue-500"
+                required
+              />
+
+              <input
+                type="text"
+                placeholder="Apellido"
+                value={lastname}
+                onChange={(e) => setLastname(e.target.value)}
+                className="w-full mb-4 p-4 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-blue-500"
+                required
+              />
+            </>
+          )}
+
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full mb-4 p-4 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-blue-500"
+            required
+          />
+
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full mb-6 p-4 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-blue-500"
+            required
+          />
+
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-black text-lg transition-all"
+          >
+            {isRegister ? "Registrarme" : "Ingresar"}
+          </button>
+
+          {message && (
+            <div className="mt-5 text-center text-slate-200 bg-slate-800 rounded-xl p-3 border border-slate-700">
+              {message}
+            </div>
+          )}
+
+          <p
+            className="text-center mt-6 cursor-pointer text-slate-400 hover:text-white"
+            onClick={() => {
+              setIsRegister(!isRegister)
+              setMessage("")
+            }}
+          >
+            {isRegister
+              ? "Ya tengo cuenta. Iniciar sesión"
+              : "No tengo cuenta. Registrarme"}
+          </p>
+        </form>
+
+      </div>
+
     </div>
   )
 }
