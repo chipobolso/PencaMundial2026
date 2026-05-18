@@ -54,6 +54,7 @@ function GroupSection({
                 user={user}
                 date={match.date}
                 time={match.time}
+                stadium={match.stadium}
                 home={match.home}
                 away={match.away}
                 realHome={result?.realHome ?? ""}

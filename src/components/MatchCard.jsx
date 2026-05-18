@@ -119,7 +119,7 @@ function MatchCard(props) {
       }
     >
 
-      <div className="flex justify-between items-start gap-3 mb-4">
+      <div className="flex justify-between items-start gap-3 mb-3">
         <div>
           <div className="text-xs md:text-sm font-black">
             {props.date}
@@ -144,6 +144,12 @@ function MatchCard(props) {
           </div>
         )}
       </div>
+
+      {props.stadium && (
+        <div className="mb-3 text-[11px] md:text-xs text-slate-400 bg-slate-900/80 border border-slate-800 rounded-xl px-3 py-2">
+          🏟️ {props.stadium}
+        </div>
+      )}
 
       {hasPrediction && (
         <div className="mb-3 bg-blue-500/10 border border-blue-500/40 rounded-xl p-2 text-center">
