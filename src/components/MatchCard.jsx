@@ -12,6 +12,7 @@ function MatchCard(props) {
   const [isLocked, setIsLocked] = useState(false)
   const [allPredictions, setAllPredictions] = useState([])
   const [timeLeft, setTimeLeft] = useState("")
+  const [showCountdown, setShowCountdown] = useState(false)
 
   const hasRealResult =
     props.realHome !== "" &&
@@ -19,7 +20,6 @@ function MatchCard(props) {
     props.realHome !== undefined &&
     props.realAway !== undefined
 
-  // ⏱️ Contador
   useEffect(() => {
     const matchDateTime = new Date(`${props.date} ${props.time}`)
     const lockTime = new Date(matchDateTime.getTime() - 15 * 60 * 1000)
@@ -30,15 +30,23 @@ function MatchCard(props) {
 
       if (diff <= 0) {
         setIsLocked(true)
+        setShowCountdown(false)
         setTimeLeft("00:00:00")
         return
       }
 
-      const hours = String(Math.floor(diff / 1000 / 60 / 60)).padStart(2, "0")
-      const minutes = String(Math.floor((diff / 1000 / 60) % 60)).padStart(2, "0")
-      const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, "0")
+      // ⏱ Mostrar contador solo si faltan menos de 24h
+      if (diff <= 24 * 60 * 60 * 1000) {
+        setShowCountdown(true)
 
-      setTimeLeft(`${hours}:${minutes}:${seconds}`)
+        const hours = String(Math.floor(diff / 1000 / 60 / 60)).padStart(2, "0")
+        const minutes = String(Math.floor((diff / 1000 / 60) % 60)).padStart(2, "0")
+        const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, "0")
+
+        setTimeLeft(`${hours}:${minutes}:${seconds}`)
+      } else {
+        setShowCountdown(false)
+      }
     }
 
     updateTimer()
@@ -107,9 +115,13 @@ function MatchCard(props) {
           <div className="bg-gray-500/20 border border-gray-500 text-gray-300 px-3 py-1 rounded-xl text-xs font-bold">
             🔒 CERRADO
           </div>
-        ) : (
+        ) : showCountdown ? (
           <div className="bg-red-500/20 border border-red-500 text-red-300 px-3 py-1 rounded-xl text-xs font-bold">
             ⏳ {timeLeft}
+          </div>
+        ) : (
+          <div className="bg-green-500/20 border border-green-500 text-green-300 px-3 py-1 rounded-xl text-xs font-bold">
+            🟢 ABIERTO
           </div>
         )}
       </div>
