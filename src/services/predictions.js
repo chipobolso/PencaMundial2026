@@ -66,3 +66,18 @@ export async function getPredictionsByMatch(matchId) {
 
   return predictions
 }
+
+export async function getUserPredictions(userId) {
+  const predictionsRef = collection(db, "predictions")
+  const q = query(predictionsRef, where("userId", "==", userId))
+
+  const snapshot = await getDocs(q)
+
+  const predictions = []
+
+  snapshot.forEach((doc) => {
+    predictions.push(doc.data())
+  })
+
+  return predictions
+}

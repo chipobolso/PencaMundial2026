@@ -6,15 +6,18 @@ import AdminUsersPanel from "./components/AdminUsersPanel"
 import ExtrasPanel from "./components/ExtrasPanel"
 import AdminExtrasPanel from "./components/AdminExtrasPanel"
 import GroupSection from "./components/GroupSection"
+import ProgressPanel from "./components/ProgressPanel"
 import { calculateMatchPoints } from "./services/scoring"
 import { getRanking } from "./services/ranking"
 import { getMatchResults } from "./services/matches"
+import { getUserPredictions } from "./services/predictions"
 import { groups, allMatchesBase } from "./data/fixtures"
 
 function App() {
   const [user, setUser] = useState(null)
   const [ranking, setRanking] = useState([])
   const [matchResults, setMatchResults] = useState({})
+  const [completedPredictions, setCompletedPredictions] = useState(0)
 
   const adminEmail = "chipomartin88@gmail.com"
 
@@ -45,6 +48,17 @@ function App() {
 
       const rankingData = await getRanking(matchesWithResults)
       setRanking(rankingData)
+
+      const userPredictions = await getUserPredictions(user.uid)
+
+      const completed = userPredictions.filter((prediction) =>
+        prediction.homeScore !== "" &&
+        prediction.awayScore !== "" &&
+        prediction.homeScore !== undefined &&
+        prediction.awayScore !== undefined
+      ).length
+
+      setCompletedPredictions(completed)
     }
 
     loadData()
@@ -77,6 +91,19 @@ function App() {
 
     const rankingData = await getRanking(matchesWithResults)
     setRanking(rankingData)
+
+    if (user) {
+      const userPredictions = await getUserPredictions(user.uid)
+
+      const completed = userPredictions.filter((prediction) =>
+        prediction.homeScore !== "" &&
+        prediction.awayScore !== "" &&
+        prediction.homeScore !== undefined &&
+        prediction.awayScore !== undefined
+      ).length
+
+      setCompletedPredictions(completed)
+    }
   }
 
   if (!user) {
@@ -122,6 +149,11 @@ function App() {
             />
           </>
         )}
+
+        <ProgressPanel
+          completed={completedPredictions}
+          total={allMatchesBase.length}
+        />
 
         <div className="bg-slate-900 rounded-3xl p-6 border border-slate-800 shadow-2xl mb-6">
           <h2 className="text-3xl font-black mb-5">
