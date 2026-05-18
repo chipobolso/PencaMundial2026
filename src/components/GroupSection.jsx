@@ -7,22 +7,23 @@ function GroupSection({
   matches,
   matchResults,
   user,
-  calculateMatchPoints
+  calculateMatchPoints,
+  showToast
 }) {
   const groupTeams = teams.filter((team) =>
     matches.some((match) => match.home === team || match.away === team)
   )
 
   return (
-    <div className="mb-10 bg-slate-900/70 border border-slate-800 rounded-3xl p-5 shadow-2xl">
+    <div className="mb-8 bg-slate-900/70 border border-slate-800 rounded-3xl p-4 md:p-5 shadow-2xl">
 
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="text-3xl font-black">
+          <h2 className="text-2xl md:text-3xl font-black">
             Grupo {groupName}
           </h2>
 
-          <p className="text-slate-400 text-sm">
+          <p className="text-slate-400 text-xs md:text-sm">
             Completá tus 6 pronósticos del grupo
           </p>
         </div>
@@ -34,7 +35,7 @@ function GroupSection({
 
       <div className="grid xl:grid-cols-5 gap-5">
 
-        <div className="xl:col-span-2">
+        <div className="xl:col-span-2 overflow-x-auto">
           <GroupTable
             teams={groupTeams}
             matches={matches}
@@ -42,7 +43,7 @@ function GroupSection({
           />
         </div>
 
-        <div className="xl:col-span-3 grid md:grid-cols-2 gap-4">
+        <div className="xl:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4">
           {matches.map((match) => {
             const result = matchResults[match.id]
 
@@ -58,6 +59,7 @@ function GroupSection({
                 realHome={result?.realHome ?? ""}
                 realAway={result?.realAway ?? ""}
                 calculateMatchPoints={calculateMatchPoints}
+                showToast={showToast}
               />
             )
           })}

@@ -8,7 +8,6 @@ import {
 function MatchCard(props) {
   const [homeScore, setHomeScore] = useState("")
   const [awayScore, setAwayScore] = useState("")
-  const [saved, setSaved] = useState(false)
   const [isLocked, setIsLocked] = useState(false)
   const [allPredictions, setAllPredictions] = useState([])
   const [timeLeft, setTimeLeft] = useState("")
@@ -35,7 +34,6 @@ function MatchCard(props) {
         return
       }
 
-      // ⏱ Mostrar contador solo si faltan menos de 24h
       if (diff <= 24 * 60 * 60 * 1000) {
         setShowCountdown(true)
 
@@ -89,20 +87,17 @@ function MatchCard(props) {
       awayScore
     })
 
-    setSaved(true)
-
-    setTimeout(() => {
-      setSaved(false)
-    }, 1800)
+    if (props.showToast) {
+      props.showToast("Pronóstico guardado correctamente ✔")
+    }
   }
 
   return (
-    <div className="bg-slate-950 rounded-2xl p-4 border border-slate-800 shadow-lg">
+    <div className="bg-slate-950 rounded-2xl p-3 md:p-4 border border-slate-800 shadow-lg">
 
-      {/* Header */}
       <div className="flex justify-between items-start gap-3 mb-4">
         <div>
-          <div className="text-sm font-black">
+          <div className="text-xs md:text-sm font-black">
             {props.date}
           </div>
 
@@ -135,9 +130,9 @@ function MatchCard(props) {
         </div>
       )}
 
-      <div className="grid grid-cols-[1fr_auto_1fr] gap-3 items-center">
+      <div className="grid grid-cols-[1fr_auto_1fr] gap-2 md:gap-3 items-center">
 
-        <div className="font-black text-sm text-right break-words">
+        <div className="font-black text-xs md:text-sm text-right break-words">
           {props.home}
         </div>
 
@@ -148,10 +143,10 @@ function MatchCard(props) {
             value={homeScore}
             disabled={isLocked}
             onChange={(e) => setHomeScore(e.target.value)}
-            className="w-11 h-11 rounded-xl bg-slate-900 border border-slate-700 text-center text-xl font-black disabled:opacity-50"
+            className="w-10 h-10 md:w-11 md:h-11 rounded-xl bg-slate-900 border border-slate-700 text-center text-lg md:text-xl font-black disabled:opacity-50"
           />
 
-          <span>-</span>
+          <span className="text-slate-500 font-black">-</span>
 
           <input
             type="number"
@@ -159,11 +154,11 @@ function MatchCard(props) {
             value={awayScore}
             disabled={isLocked}
             onChange={(e) => setAwayScore(e.target.value)}
-            className="w-11 h-11 rounded-xl bg-slate-900 border border-slate-700 text-center text-xl font-black disabled:opacity-50"
+            className="w-10 h-10 md:w-11 md:h-11 rounded-xl bg-slate-900 border border-slate-700 text-center text-lg md:text-xl font-black disabled:opacity-50"
           />
         </div>
 
-        <div className="font-black text-sm text-left break-words">
+        <div className="font-black text-xs md:text-sm text-left break-words">
           {props.away}
         </div>
 
@@ -173,19 +168,13 @@ function MatchCard(props) {
         {!isLocked ? (
           <button
             onClick={handleSave}
-            className="bg-green-600 hover:bg-green-500 px-4 py-2 rounded-xl font-black text-sm"
+            className="bg-green-600 hover:bg-green-500 px-4 py-2 rounded-xl font-black text-sm w-full md:w-auto"
           >
             Guardar
           </button>
         ) : (
           <div className="text-xs text-slate-500">
             Pronóstico cerrado
-          </div>
-        )}
-
-        {saved && (
-          <div className="text-green-400 text-xs font-bold">
-            ✔ Guardado
           </div>
         )}
       </div>
@@ -215,13 +204,13 @@ function MatchCard(props) {
                 return (
                   <div
                     key={index}
-                    className="bg-slate-950 rounded-lg p-2 flex justify-between items-center border border-slate-800 text-xs"
+                    className="bg-slate-950 rounded-lg p-2 flex justify-between items-center border border-slate-800 text-xs gap-3"
                   >
-                    <span className="font-bold">
+                    <span className="font-bold truncate">
                       {prediction.userName}
                     </span>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                       <span className="font-black">
                         {prediction.homeScore} - {prediction.awayScore}
                       </span>
