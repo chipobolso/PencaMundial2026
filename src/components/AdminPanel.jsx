@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { saveMatchResult } from "../services/matches"
+import { resetWorldCup } from "../services/admin"
 
 function AdminPanel({ matches, refreshResults }) {
   const [selectedMatchId, setSelectedMatchId] = useState(matches[0]?.id || "")
@@ -24,6 +25,18 @@ function AdminPanel({ matches, refreshResults }) {
     setTimeout(() => {
       setSaved(false)
     }, 2500)
+  }
+
+  async function handleReset() {
+    const confirmReset = confirm("⚠️ Esto va a borrar TODOS los datos del Mundial. ¿Seguro?")
+
+    if (!confirmReset) return
+
+    await resetWorldCup()
+
+    alert("🔥 Mundial reseteado correctamente")
+
+    await refreshResults()
   }
 
   return (
@@ -97,9 +110,24 @@ function AdminPanel({ matches, refreshResults }) {
 
       {saved && (
         <div className="mt-4 bg-green-500/20 border border-green-500 text-green-300 rounded-xl p-3 font-bold">
-          Resultado guardado y ranking actualizado ✔
+          Resultado guardado ✔
         </div>
       )}
+
+      {/* 🔥 BOTÓN RESET */}
+      <div className="mt-8 border-t border-slate-700 pt-6">
+        <button
+          onClick={handleReset}
+          className="bg-red-700 hover:bg-red-600 px-6 py-3 rounded-2xl font-black w-full"
+        >
+          🧨 Reset Mundial (BORRA TODO)
+        </button>
+
+        <p className="text-xs text-slate-500 mt-2 text-center">
+          Esto elimina pronósticos, resultados y extras.
+        </p>
+      </div>
+
     </div>
   )
 }
