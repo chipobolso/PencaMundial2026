@@ -21,7 +21,11 @@ export async function getRanking(allMatches) {
   const extras = []
 
   usersSnapshot.forEach((doc) => {
-    users.push(doc.data())
+    const user = doc.data()
+
+    if (user.status === "approved") {
+      users.push(user)
+    }
   })
 
   predictionsSnapshot.forEach((doc) => {

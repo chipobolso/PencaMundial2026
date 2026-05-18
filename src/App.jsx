@@ -8,6 +8,7 @@ import AdminExtrasPanel from "./components/AdminExtrasPanel"
 import GroupSection from "./components/GroupSection"
 import ProgressPanel from "./components/ProgressPanel"
 import Toast from "./components/Toast"
+import PrizesPanel from "./components/PrizesPanel"
 import { calculateMatchPoints } from "./services/scoring"
 import { getRanking } from "./services/ranking"
 import { getMatchResults } from "./services/matches"
@@ -206,6 +207,8 @@ function App() {
               completed={completedPredictions}
               total={allMatchesBase.length}
             />
+
+            <PrizesPanel participantsCount={ranking.length} />
 
             <div className="bg-slate-900 rounded-3xl p-4 md:p-6 border border-slate-800 shadow-2xl mb-6">
               <h2 className="text-2xl md:text-3xl font-black mb-5">
