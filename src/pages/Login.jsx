@@ -36,10 +36,16 @@ function Login({ onLogin }) {
 
       <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
 
+        {/* PANEL IZQUIERDO */}
         <div className="bg-gradient-to-br from-blue-700 via-sky-700 to-slate-900 rounded-3xl p-8 md:p-10 shadow-2xl border border-blue-400/30">
 
-          <div className="text-7xl md:text-8xl mb-6">
-            🏆
+          {/* COPA DEL MUNDO */}
+          <div className="mb-6 flex justify-center lg:justify-start">
+            <img
+              src="/worldcup.png"
+              alt="Copa del Mundo"
+              className="w-28 md:w-40 drop-shadow-2xl hover:scale-110 transition-transform duration-300"
+            />
           </div>
 
           <h1 className="text-4xl md:text-6xl font-black leading-tight mb-4">
@@ -50,6 +56,7 @@ function Login({ onLogin }) {
             Estados Unidos · Canadá · México
           </p>
 
+          {/* BANDERAS */}
           <div className="grid grid-cols-3 gap-3 mb-8">
             <div className="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
               <div className="text-2xl mb-1">🇺🇸</div>
@@ -67,6 +74,7 @@ function Login({ onLogin }) {
             </div>
           </div>
 
+          {/* INFO */}
           <div className="space-y-3 text-sm md:text-base text-slate-200">
             <div className="bg-black/20 rounded-2xl p-4">
               ⚽ Completá tus pronósticos de la fase de grupos.
@@ -83,6 +91,7 @@ function Login({ onLogin }) {
 
         </div>
 
+        {/* FORMULARIO */}
         <form
           onSubmit={handleSubmit}
           className="bg-slate-900 p-8 md:p-10 rounded-3xl w-full shadow-2xl border border-slate-800"
