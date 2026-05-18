@@ -28,9 +28,16 @@ function AdminPanel({ matches, refreshResults }) {
   }
 
   async function handleReset() {
-    const confirmReset = confirm("⚠️ Esto va a borrar TODOS los datos del Mundial. ¿Seguro?")
+    const firstConfirm = confirm("⚠️ Esto va a borrar pronósticos, resultados y extras. ¿Querés continuar?")
 
-    if (!confirmReset) return
+    if (!firstConfirm) return
+
+    const secondConfirm = prompt('Para confirmar, escribí exactamente: RESET')
+
+    if (secondConfirm !== "RESET") {
+      alert("Reset cancelado.")
+      return
+    }
 
     await resetWorldCup()
 
@@ -114,20 +121,18 @@ function AdminPanel({ matches, refreshResults }) {
         </div>
       )}
 
-      {/* 🔥 BOTÓN RESET */}
       <div className="mt-8 border-t border-slate-700 pt-6">
         <button
           onClick={handleReset}
           className="bg-red-700 hover:bg-red-600 px-6 py-3 rounded-2xl font-black w-full"
         >
-          🧨 Reset Mundial (BORRA TODO)
+          🧨 Reset Mundial
         </button>
 
         <p className="text-xs text-slate-500 mt-2 text-center">
-          Esto elimina pronósticos, resultados y extras.
+          Para confirmar el reset te va a pedir escribir RESET.
         </p>
       </div>
-
     </div>
   )
 }

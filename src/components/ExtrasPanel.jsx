@@ -1,62 +1,15 @@
 import { useEffect, useState } from "react"
 import { getUserExtras, saveUserExtras } from "../services/extras"
+import { teams } from "../data/fixtures"
 
 function ExtrasPanel({ user }) {
   const [champion, setChampion] = useState("")
   const [topScorer, setTopScorer] = useState("")
   const [saved, setSaved] = useState(false)
 
-  // 🔥 LISTA DE SELECCIONES (base fuerte)
-  const teams = [
-    "Argentina",
-    "Brasil",
-    "Uruguay",
-    "Francia",
-    "España",
-    "Inglaterra",
-    "Portugal",
-    "Alemania",
-    "Países Bajos",
-    "Italia",
-    "Bélgica",
-    "Croacia",
-    "México",
-    "Estados Unidos",
-    "Colombia",
-    "Chile",
-    "Perú",
-    "Ecuador",
-    "Paraguay",
-    "Venezuela",
-    "Japón",
-    "Corea del Sur",
-    "Arabia Saudita",
-    "Irán",
-    "Australia",
-    "Marruecos",
-    "Senegal",
-    "Nigeria",
-    "Camerún",
-    "Ghana",
-    "Egipto",
-    "Canadá",
-    "Costa Rica",
-    "Panamá",
-    "Polonia",
-    "Suiza",
-    "Dinamarca",
-    "Suecia",
-    "Noruega",
-    "Austria",
-    "Serbia",
-    "Turquía",
-    "República Checa",
-    "Grecia",
-    "Ucrania",
-    "Rumania",
-    "Escocia",
-    "Gales"
-  ]
+  const firstMatchDate = new Date("2026-06-11T16:00:00-03:00")
+  const lockTime = new Date(firstMatchDate.getTime() - 15 * 60 * 1000)
+  const isLocked = new Date() >= lockTime
 
   useEffect(() => {
     async function loadExtras() {
@@ -74,6 +27,11 @@ function ExtrasPanel({ user }) {
   async function handleSave(e) {
     e.preventDefault()
 
+    if (isLocked) {
+      alert("Los extras ya están cerrados.")
+      return
+    }
+
     await saveUserExtras(user.uid, {
       champion,
       topScorer
@@ -88,12 +46,24 @@ function ExtrasPanel({ user }) {
 
   return (
     <div className="bg-slate-900 rounded-3xl p-6 border border-slate-800 shadow-2xl mb-10">
-      <h2 className="text-3xl font-black mb-2">
-        ⭐ Extras
-      </h2>
+      <div className="flex justify-between items-start gap-4 mb-2">
+        <h2 className="text-3xl font-black">
+          ⭐ Extras
+        </h2>
+
+        {isLocked ? (
+          <div className="bg-gray-500/20 border border-gray-500 text-gray-300 px-3 py-1 rounded-xl text-xs font-bold">
+            🔒 CERRADO
+          </div>
+        ) : (
+          <div className="bg-green-500/20 border border-green-500 text-green-300 px-3 py-1 rounded-xl text-xs font-bold">
+            ABIERTO
+          </div>
+        )}
+      </div>
 
       <p className="text-slate-400 mb-6">
-        Campeón suma 20 puntos. Goleador suma 15 puntos.
+        Campeón suma 20 puntos. Goleador suma 15 puntos. Se bloquean 15 minutos antes del primer partido.
       </p>
 
       <form onSubmit={handleSave} className="grid md:grid-cols-3 gap-4 items-end">
@@ -105,8 +75,9 @@ function ExtrasPanel({ user }) {
 
           <select
             value={champion}
+            disabled={isLocked}
             onChange={(e) => setChampion(e.target.value)}
-            className="w-full p-4 rounded-xl bg-slate-800 border border-slate-700"
+            className="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 disabled:opacity-50"
             required
           >
             <option value="">Seleccionar campeón</option>
@@ -127,19 +98,22 @@ function ExtrasPanel({ user }) {
           <input
             type="text"
             value={topScorer}
+            disabled={isLocked}
             onChange={(e) => setTopScorer(e.target.value)}
             placeholder="Ej: Mbappé"
-            className="w-full p-4 rounded-xl bg-slate-800 border border-slate-700"
+            className="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 disabled:opacity-50"
             required
           />
         </div>
 
-        <button
-          type="submit"
-          className="bg-purple-600 hover:bg-purple-500 p-4 rounded-xl font-black"
-        >
-          Guardar extras
-        </button>
+        {!isLocked && (
+          <button
+            type="submit"
+            className="bg-purple-600 hover:bg-purple-500 p-4 rounded-xl font-black"
+          >
+            Guardar extras
+          </button>
+        )}
 
       </form>
 

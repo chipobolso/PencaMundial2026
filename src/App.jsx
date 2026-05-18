@@ -123,6 +123,42 @@ function App() {
           </>
         )}
 
+        <div className="bg-slate-900 rounded-3xl p-6 border border-slate-800 shadow-2xl mb-6">
+          <h2 className="text-3xl font-black mb-5">
+            🧮 Sistema de puntajes
+          </h2>
+
+          <div className="grid md:grid-cols-4 gap-4">
+            <div className="bg-slate-800 rounded-2xl p-4">
+              <div className="text-slate-400 text-sm">Marcador exacto</div>
+              <div className="text-3xl font-black text-green-400">10 pts</div>
+            </div>
+
+            <div className="bg-slate-800 rounded-2xl p-4">
+              <div className="text-slate-400 text-sm">Diferencia de goles</div>
+              <div className="text-3xl font-black text-yellow-400">5 pts</div>
+            </div>
+
+            <div className="bg-slate-800 rounded-2xl p-4">
+              <div className="text-slate-400 text-sm">Ganador o empate</div>
+              <div className="text-3xl font-black text-blue-400">3 pts</div>
+            </div>
+
+            <div className="bg-slate-800 rounded-2xl p-4">
+              <div className="text-slate-400 text-sm">Goles exactos</div>
+              <div className="text-3xl font-black text-purple-400">+1 c/u</div>
+            </div>
+          </div>
+
+          <p className="text-slate-400 mt-4 text-sm">
+            Si acertás marcador exacto, recibís 10 puntos y no se acumulan diferencia, ganador ni goles exactos.
+          </p>
+
+          <p className="text-slate-400 mt-2 text-sm">
+            Campeón correcto suma 20 puntos. Goleador correcto suma 15 puntos.
+          </p>
+        </div>
+
         <div className="grid lg:grid-cols-2 gap-6 mb-6">
           <RankingTable ranking={ranking} />
           <ExtrasPanel user={user} />
