@@ -10,6 +10,7 @@ import ProgressPanel from "./components/ProgressPanel"
 import Toast from "./components/Toast"
 import PrizesPanel from "./components/PrizesPanel"
 import PredictionsHistory from "./components/PredictionsHistory"
+import PendingPredictionsAlert from "./components/PendingPredictionsAlert"
 import { calculateMatchPoints } from "./services/scoring"
 import { getRanking } from "./services/ranking"
 import { getMatchResults } from "./services/matches"
@@ -23,6 +24,7 @@ function App() {
   const [completedPredictions, setCompletedPredictions] = useState(0)
   const [activeTab, setActiveTab] = useState("inicio")
   const [toastMessage, setToastMessage] = useState("")
+  const [userPredictions, setUserPredictions] = useState([])
 
   const adminEmail = "chipomartin88@gmail.com"
 
@@ -33,6 +35,60 @@ function App() {
       setToastMessage("")
     }, 2500)
   }
+
+  function parseMatchDate(dateText, timeText) {
+    const months = {
+      Enero: 0,
+      Febrero: 1,
+      Marzo: 2,
+      Abril: 3,
+      Mayo: 4,
+      Junio: 5,
+      Julio: 6,
+      Agosto: 7,
+      Septiembre: 8,
+      Octubre: 9,
+      Noviembre: 10,
+      Diciembre: 11
+    }
+
+    const [day, monthName, year] = dateText.split(" ")
+    const [hour, minute] = timeText.split(":")
+
+    return new Date(
+      Number(year),
+      months[monthName],
+      Number(day),
+      Number(hour),
+      Number(minute)
+    )
+  }
+
+  function getPendingUpcomingCount() {
+    const now = new Date()
+
+    const predictionMatchIds = userPredictions
+      .filter((prediction) =>
+        prediction.homeScore !== "" &&
+        prediction.awayScore !== "" &&
+        prediction.homeScore !== undefined &&
+        prediction.awayScore !== undefined
+      )
+      .map((prediction) => prediction.matchId)
+
+    return allMatchesBase.filter((match) => {
+      const matchDate = parseMatchDate(match.date, match.time)
+      const lockTime = new Date(matchDate.getTime() - 15 * 60 * 1000)
+      const diff = lockTime - now
+
+      const closesWithin24h = diff > 0 && diff <= 24 * 60 * 60 * 1000
+      const alreadyPredicted = predictionMatchIds.includes(match.id)
+
+      return closesWithin24h && !alreadyPredicted
+    }).length
+  }
+
+  const pendingUpcomingCount = getPendingUpcomingCount()
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user")
@@ -62,9 +118,10 @@ function App() {
       const rankingData = await getRanking(matchesWithResults)
       setRanking(rankingData)
 
-      const userPredictions = await getUserPredictions(user.uid)
+      const predictions = await getUserPredictions(user.uid)
+      setUserPredictions(predictions)
 
-      const completed = userPredictions.filter((prediction) =>
+      const completed = predictions.filter((prediction) =>
         prediction.homeScore !== "" &&
         prediction.awayScore !== "" &&
         prediction.homeScore !== undefined &&
@@ -106,9 +163,10 @@ function App() {
     setRanking(rankingData)
 
     if (user) {
-      const userPredictions = await getUserPredictions(user.uid)
+      const predictions = await getUserPredictions(user.uid)
+      setUserPredictions(predictions)
 
-      const completed = userPredictions.filter((prediction) =>
+      const completed = predictions.filter((prediction) =>
         prediction.homeScore !== "" &&
         prediction.awayScore !== "" &&
         prediction.homeScore !== undefined &&
@@ -211,6 +269,11 @@ function App() {
 
         {activeTab === "inicio" && (
           <>
+            <PendingPredictionsAlert
+              pendingCount={pendingUpcomingCount}
+              onGoToPredictions={() => setActiveTab("historial")}
+            />
+
             <ProgressPanel
               completed={completedPredictions}
               total={allMatchesBase.length}
