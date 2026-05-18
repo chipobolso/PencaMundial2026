@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { getPredictionsByMatch } from "../services/predictions"
 import { getAllExtras } from "../services/extras"
-import UpcomingMatches from "./UpcomingMatchesPanel"
+import UpcomingMatchesPanel from "./UpcomingMatchesPanel"
 
 function parseMatchDate(dateText, timeText) {
   const months = {
@@ -36,7 +36,8 @@ function PredictionsHistory({
   user,
   calculateMatchPoints,
   matchResults,
-  showToast
+  showToast,
+  userPredictions
 }) {
   const [history, setHistory] = useState([])
   const [extras, setExtras] = useState([])
@@ -83,12 +84,13 @@ function PredictionsHistory({
   return (
     <div className="space-y-6">
 
-      <UpcomingMatches
+      <UpcomingMatchesPanel
         matches={matches}
         user={user}
         calculateMatchPoints={calculateMatchPoints}
         matchResults={matchResults}
         showToast={showToast}
+        userPredictions={userPredictions}
       />
 
       <div className="bg-slate-900 rounded-3xl p-5 md:p-6 border border-slate-800 shadow-2xl">
