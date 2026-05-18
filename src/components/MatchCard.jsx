@@ -8,6 +8,7 @@ import {
 function MatchCard(props) {
   const [homeScore, setHomeScore] = useState("")
   const [awayScore, setAwayScore] = useState("")
+  const [hasPrediction, setHasPrediction] = useState(false)
   const [isLocked, setIsLocked] = useState(false)
   const [allPredictions, setAllPredictions] = useState([])
   const [timeLeft, setTimeLeft] = useState("")
@@ -18,6 +19,16 @@ function MatchCard(props) {
     props.realAway !== "" &&
     props.realHome !== undefined &&
     props.realAway !== undefined
+
+  const myPoints =
+    hasRealResult && hasPrediction
+      ? props.calculateMatchPoints(
+          homeScore,
+          awayScore,
+          props.realHome,
+          props.realAway
+        )
+      : null
 
   useEffect(() => {
     const matchDateTime = new Date(`${props.date} ${props.time}`)
@@ -60,6 +71,7 @@ function MatchCard(props) {
       if (prediction) {
         setHomeScore(prediction.homeScore)
         setAwayScore(prediction.awayScore)
+        setHasPrediction(true)
       }
     }
 
@@ -87,13 +99,25 @@ function MatchCard(props) {
       awayScore
     })
 
+    setHasPrediction(true)
+
     if (props.showToast) {
-      props.showToast("Pronóstico guardado correctamente ✔")
+      props.showToast(
+        hasPrediction
+          ? "Pronóstico modificado correctamente ✔"
+          : "Pronóstico guardado correctamente ✔"
+      )
     }
   }
 
   return (
-    <div className="bg-slate-950 rounded-2xl p-3 md:p-4 border border-slate-800 shadow-lg">
+    <div
+      className={
+        hasPrediction
+          ? "bg-slate-950 rounded-2xl p-3 md:p-4 border border-blue-500/60 shadow-lg"
+          : "bg-slate-950 rounded-2xl p-3 md:p-4 border border-slate-800 shadow-lg"
+      }
+    >
 
       <div className="flex justify-between items-start gap-3 mb-4">
         <div>
@@ -120,6 +144,14 @@ function MatchCard(props) {
           </div>
         )}
       </div>
+
+      {hasPrediction && (
+        <div className="mb-3 bg-blue-500/10 border border-blue-500/40 rounded-xl p-2 text-center">
+          <div className="text-xs font-bold text-blue-300">
+            Pronóstico cargado
+          </div>
+        </div>
+      )}
 
       {hasRealResult && (
         <div className="mb-3 bg-emerald-500/10 border border-emerald-500/40 rounded-xl p-2 text-center">
@@ -164,17 +196,33 @@ function MatchCard(props) {
 
       </div>
 
-      <div className="mt-4 flex justify-between items-center">
+      <div className="mt-4 flex flex-col md:flex-row justify-between md:items-center gap-3">
         {!isLocked ? (
           <button
             onClick={handleSave}
-            className="bg-green-600 hover:bg-green-500 px-4 py-2 rounded-xl font-black text-sm w-full md:w-auto"
+            className={
+              hasPrediction
+                ? "bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-xl font-black text-sm w-full md:w-auto"
+                : "bg-green-600 hover:bg-green-500 px-4 py-2 rounded-xl font-black text-sm w-full md:w-auto"
+            }
           >
-            Guardar
+            {hasPrediction ? "Modificar" : "Guardar"}
           </button>
         ) : (
           <div className="text-xs text-slate-500">
             Pronóstico cerrado
+          </div>
+        )}
+
+        {hasRealResult && hasPrediction && (
+          <div className="bg-purple-600/20 border border-purple-500 text-purple-300 px-3 py-2 rounded-xl text-xs font-black text-center">
+            Tus puntos: {myPoints}
+          </div>
+        )}
+
+        {hasRealResult && !hasPrediction && (
+          <div className="bg-slate-800 border border-slate-700 text-slate-400 px-3 py-2 rounded-xl text-xs font-bold text-center">
+            Sin pronóstico: 0 pts
           </div>
         )}
       </div>
