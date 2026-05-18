@@ -34,9 +34,24 @@ export async function getAllExtras() {
 
   const extras = []
 
-  snapshot.forEach((doc) => {
-    extras.push(doc.data())
-  })
+  for (const extraDoc of snapshot.docs) {
+    const extra = extraDoc.data()
+
+    const userRef = doc(db, "users", extra.userId)
+    const userSnap = await getDoc(userRef)
+
+    let userName = "Usuario sin nombre"
+
+    if (userSnap.exists()) {
+      const userData = userSnap.data()
+      userName = `${userData.name} ${userData.lastname}`
+    }
+
+    extras.push({
+      ...extra,
+      userName
+    })
+  }
 
   return extras
 }
