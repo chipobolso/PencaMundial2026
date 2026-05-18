@@ -11,6 +11,7 @@ function MatchCard(props) {
   const [saved, setSaved] = useState(false)
   const [isLocked, setIsLocked] = useState(false)
   const [allPredictions, setAllPredictions] = useState([])
+  const [timeLeft, setTimeLeft] = useState("")
 
   const hasRealResult =
     props.realHome !== "" &&
@@ -18,14 +19,32 @@ function MatchCard(props) {
     props.realHome !== undefined &&
     props.realAway !== undefined
 
+  // ⏱️ Contador
   useEffect(() => {
     const matchDateTime = new Date(`${props.date} ${props.time}`)
     const lockTime = new Date(matchDateTime.getTime() - 15 * 60 * 1000)
-    const now = new Date()
 
-    if (now >= lockTime) {
-      setIsLocked(true)
+    function updateTimer() {
+      const now = new Date()
+      const diff = lockTime - now
+
+      if (diff <= 0) {
+        setIsLocked(true)
+        setTimeLeft("00:00:00")
+        return
+      }
+
+      const hours = String(Math.floor(diff / 1000 / 60 / 60)).padStart(2, "0")
+      const minutes = String(Math.floor((diff / 1000 / 60) % 60)).padStart(2, "0")
+      const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, "0")
+
+      setTimeLeft(`${hours}:${minutes}:${seconds}`)
     }
+
+    updateTimer()
+    const interval = setInterval(updateTimer, 1000)
+
+    return () => clearInterval(interval)
   }, [props.date, props.time])
 
   useEffect(() => {
@@ -72,6 +91,7 @@ function MatchCard(props) {
   return (
     <div className="bg-slate-950 rounded-2xl p-4 border border-slate-800 shadow-lg">
 
+      {/* Header */}
       <div className="flex justify-between items-start gap-3 mb-4">
         <div>
           <div className="text-sm font-black">
@@ -84,12 +104,12 @@ function MatchCard(props) {
         </div>
 
         {isLocked ? (
-          <div className="bg-gray-500/20 border border-gray-500 text-gray-300 px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap">
+          <div className="bg-gray-500/20 border border-gray-500 text-gray-300 px-3 py-1 rounded-xl text-xs font-bold">
             🔒 CERRADO
           </div>
         ) : (
-          <div className="bg-red-500/20 border border-red-500 text-red-300 px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap">
-            ABIERTO
+          <div className="bg-red-500/20 border border-red-500 text-red-300 px-3 py-1 rounded-xl text-xs font-bold">
+            ⏳ {timeLeft}
           </div>
         )}
       </div>
@@ -105,7 +125,7 @@ function MatchCard(props) {
 
       <div className="grid grid-cols-[1fr_auto_1fr] gap-3 items-center">
 
-        <div className="font-black text-sm text-right leading-tight break-words">
+        <div className="font-black text-sm text-right break-words">
           {props.home}
         </div>
 
@@ -119,7 +139,7 @@ function MatchCard(props) {
             className="w-11 h-11 rounded-xl bg-slate-900 border border-slate-700 text-center text-xl font-black disabled:opacity-50"
           />
 
-          <span className="text-slate-500 font-black">-</span>
+          <span>-</span>
 
           <input
             type="number"
@@ -131,7 +151,7 @@ function MatchCard(props) {
           />
         </div>
 
-        <div className="font-black text-sm text-left leading-tight break-words">
+        <div className="font-black text-sm text-left break-words">
           {props.away}
         </div>
 
@@ -141,7 +161,7 @@ function MatchCard(props) {
         {!isLocked ? (
           <button
             onClick={handleSave}
-            className="bg-green-600 hover:bg-green-500 transition-all px-4 py-2 rounded-xl font-black text-sm"
+            className="bg-green-600 hover:bg-green-500 px-4 py-2 rounded-xl font-black text-sm"
           >
             Guardar
           </button>
@@ -153,7 +173,7 @@ function MatchCard(props) {
 
         {saved && (
           <div className="text-green-400 text-xs font-bold">
-            Guardado ✔
+            ✔ Guardado
           </div>
         )}
       </div>
