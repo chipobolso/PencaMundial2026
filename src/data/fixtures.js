@@ -1,7 +1,7 @@
 export const groups = {
   A: [
-    { id: "A1", group: "A", date: "18 Mayo 2026", time: "16:00", home: "México", away: "Sudáfrica", stadium: "Estadio Ciudad de México" },
-    { id: "A2", group: "A", date: "18 Mayo 2026", time: "23:00", home: "Corea del Sur", away: "Chequia", stadium: "Estadio Guadalajara" },
+    { id: "A1", group: "A", date: "11 Junio 2026", time: "16:00", home: "México", away: "Sudáfrica", stadium: "Estadio Ciudad de México" },
+    { id: "A2", group: "A", date: "11 Junio 2026", time: "23:00", home: "Corea del Sur", away: "Chequia", stadium: "Estadio Guadalajara" },
     { id: "A3", group: "A", date: "18 Junio 2026", time: "13:00", home: "Chequia", away: "Sudáfrica", stadium: "Estadio Atlanta" },
     { id: "A4", group: "A", date: "18 Junio 2026", time: "22:00", home: "México", away: "Corea del Sur", stadium: "Estadio Guadalajara" },
     { id: "A5", group: "A", date: "24 Junio 2026", time: "22:00", home: "Chequia", away: "México", stadium: "Estadio Ciudad de México" },
