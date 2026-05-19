@@ -1,16 +1,11 @@
 import { useEffect, useState } from "react"
-import {
-  getPrediction,
-  savePrediction,
-  getPredictionsByMatch
-} from "../services/predictions"
+import { getPrediction, savePrediction } from "../services/predictions"
 
 function MatchCard(props) {
   const [homeScore, setHomeScore] = useState("")
   const [awayScore, setAwayScore] = useState("")
   const [hasPrediction, setHasPrediction] = useState(false)
   const [isLocked, setIsLocked] = useState(false)
-  const [allPredictions, setAllPredictions] = useState([])
   const [timeLeft, setTimeLeft] = useState("")
   const [showCountdown, setShowCountdown] = useState(false)
 
@@ -78,17 +73,6 @@ function MatchCard(props) {
     loadPrediction()
   }, [props.user.uid, props.matchId])
 
-  useEffect(() => {
-    async function loadAllPredictions() {
-      if (!isLocked) return
-
-      const predictions = await getPredictionsByMatch(props.matchId)
-      setAllPredictions(predictions)
-    }
-
-    loadAllPredictions()
-  }, [isLocked, props.matchId])
-
   async function handleSave() {
     if (isLocked) return
 
@@ -118,7 +102,6 @@ function MatchCard(props) {
           : "bg-slate-950 rounded-2xl p-3 md:p-4 border border-slate-800 shadow-lg"
       }
     >
-
       <div className="flex justify-between items-start gap-3 mb-3">
         <div>
           <div className="text-xs md:text-sm font-black">
@@ -177,7 +160,6 @@ function MatchCard(props) {
       )}
 
       <div className="grid grid-cols-[1fr_auto_1fr] gap-2 md:gap-3 items-center">
-
         <div className="font-black text-xs md:text-sm text-right break-words">
           {props.home}
         </div>
@@ -207,7 +189,6 @@ function MatchCard(props) {
         <div className="font-black text-xs md:text-sm text-left break-words">
           {props.away}
         </div>
-
       </div>
 
       <div className="mt-4 flex flex-col md:flex-row justify-between md:items-center gap-3">
@@ -240,57 +221,6 @@ function MatchCard(props) {
           </div>
         )}
       </div>
-
-      {isLocked && (
-        <div className="mt-4 bg-slate-900 rounded-xl border border-slate-800 p-3">
-          <h3 className="text-sm font-black mb-2">
-            👀 Pronósticos
-          </h3>
-
-          {allPredictions.length === 0 ? (
-            <div className="text-slate-400 text-xs">
-              Sin pronósticos.
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {allPredictions.map((prediction, index) => {
-                const points = hasRealResult
-                  ? props.calculateMatchPoints(
-                      prediction.homeScore,
-                      prediction.awayScore,
-                      props.realHome,
-                      props.realAway
-                    )
-                  : null
-
-                return (
-                  <div
-                    key={index}
-                    className="bg-slate-950 rounded-lg p-2 flex justify-between items-center border border-slate-800 text-xs gap-3"
-                  >
-                    <span className="font-bold truncate">
-                      {prediction.userName}
-                    </span>
-
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="font-black">
-                        {prediction.homeScore} - {prediction.awayScore}
-                      </span>
-
-                      {hasRealResult && (
-                        <span className="bg-blue-600 px-2 py-1 rounded-lg font-black">
-                          {points} pts
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </div>
-      )}
-
     </div>
   )
 }

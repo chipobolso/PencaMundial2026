@@ -39,7 +39,8 @@ function PredictionsHistory({
   showToast,
   userPredictions
 }) {
-  const [history, setHistory] = useState([])
+  const [closedHistory, setClosedHistory] = useState([])
+  const [finishedHistory, setFinishedHistory] = useState([])
   const [extras, setExtras] = useState([])
 
   function isMatchLocked(match) {
@@ -49,28 +50,57 @@ function PredictionsHistory({
     return new Date() >= lockTime
   }
 
+  function hasResult(match) {
+    const result = matchResults[match.id]
+
+    return (
+      result?.realHome !== "" &&
+      result?.realAway !== "" &&
+      result?.realHome !== undefined &&
+      result?.realAway !== undefined
+    )
+  }
+
   function extrasLocked() {
-    const firstMatch = parseMatchDate("11 Junio 2026", "16:00")
-    const lockTime = new Date(firstMatch.getTime() - 15 * 60 * 1000)
+    if (!matches || matches.length === 0) return false
+
+    const orderedMatches = [...matches].sort((a, b) => {
+      return parseMatchDate(a.date, a.time) - parseMatchDate(b.date, b.time)
+    })
+
+    const firstMatch = orderedMatches[0]
+    const firstMatchDate = parseMatchDate(firstMatch.date, firstMatch.time)
+    const lockTime = new Date(firstMatchDate.getTime() - 15 * 60 * 1000)
 
     return new Date() >= lockTime
   }
 
   useEffect(() => {
     async function loadHistory() {
-      const lockedMatches = matches.filter(isMatchLocked)
-      const matchHistory = []
+      const closedMatches = matches
+        .filter(isMatchLocked)
+        .sort((a, b) => parseMatchDate(b.date, b.time) - parseMatchDate(a.date, a.time))
 
-      for (const match of lockedMatches) {
+      const closedWithoutResult = []
+      const finishedWithResult = []
+
+      for (const match of closedMatches) {
         const predictions = await getPredictionsByMatch(match.id)
 
-        matchHistory.push({
+        const item = {
           match,
           predictions
-        })
+        }
+
+        if (hasResult(match)) {
+          finishedWithResult.push(item)
+        } else {
+          closedWithoutResult.push(item)
+        }
       }
 
-      setHistory(matchHistory)
+      setClosedHistory(closedWithoutResult)
+      setFinishedHistory(finishedWithResult)
 
       if (extrasLocked()) {
         const allExtras = await getAllExtras()
@@ -79,11 +109,104 @@ function PredictionsHistory({
     }
 
     loadHistory()
-  }, [matches])
+  }, [matches, matchResults])
+
+  function renderPredictionList(predictions, match) {
+    if (predictions.length === 0) {
+      return (
+        <div className="text-slate-400 bg-slate-950 rounded-2xl p-4 border border-slate-800">
+          No hubo pronósticos para este partido.
+        </div>
+      )
+    }
+
+    const result = matchResults[match.id]
+    const matchHasResult = hasResult(match)
+
+    return (
+      <div className="space-y-2">
+        {predictions.map((prediction) => {
+          const points = matchHasResult
+            ? calculateMatchPoints(
+                prediction.homeScore,
+                prediction.awayScore,
+                result.realHome,
+                result.realAway
+              )
+            : null
+
+          return (
+            <div
+              key={prediction.userId}
+              className="bg-slate-950 rounded-2xl p-4 border border-slate-800 flex justify-between items-center gap-4"
+            >
+              <div className="font-bold truncate">
+                {prediction.userName}
+              </div>
+
+              <div className="flex items-center gap-3 shrink-0">
+                <div className="text-xl font-black">
+                  {prediction.homeScore} - {prediction.awayScore}
+                </div>
+
+                {matchHasResult && (
+                  <div className="bg-blue-600 px-3 py-1 rounded-xl text-sm font-black">
+                    {points} pts
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
+  function renderMatchBlock({ match, predictions }, showOfficialResult = false) {
+    const result = matchResults[match.id]
+
+    return (
+      <div
+        key={match.id}
+        className="bg-slate-900 rounded-3xl p-5 md:p-6 border border-slate-800 shadow-2xl"
+      >
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+          <div>
+            <h3 className="text-xl md:text-2xl font-black">
+              {match.home} vs {match.away}
+            </h3>
+
+            <p className="text-slate-400 text-sm">
+              Grupo {match.group} · {match.date} · {match.time} UYT
+            </p>
+
+            {match.stadium && (
+              <p className="text-slate-500 text-xs mt-1">
+                🏟️ {match.stadium}
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-col md:items-end gap-2">
+            <div className="bg-gray-500/20 border border-gray-500 text-gray-300 px-3 py-1 rounded-xl text-xs font-bold w-fit">
+              🔒 Cerrado
+            </div>
+
+            {showOfficialResult && result && (
+              <div className="bg-emerald-500/10 border border-emerald-500/40 text-emerald-300 px-3 py-1 rounded-xl text-xs font-black w-fit">
+                Resultado: {result.realHome} - {result.realAway}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {renderPredictionList(predictions, match)}
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
-
       <UpcomingMatchesPanel
         matches={matches}
         user={user}
@@ -95,11 +218,11 @@ function PredictionsHistory({
 
       <div className="bg-slate-900 rounded-3xl p-5 md:p-6 border border-slate-800 shadow-2xl">
         <h2 className="text-2xl md:text-3xl font-black mb-2">
-          👀 Historial de pronósticos
+          👀 Pronósticos
         </h2>
 
         <p className="text-slate-400 text-sm">
-          Los pronósticos de cada partido se muestran cuando vence el plazo de edición: 15 minutos antes del inicio.
+          Acá se muestran los pronósticos públicos una vez vencido el plazo de edición.
         </p>
       </div>
 
@@ -141,64 +264,45 @@ function PredictionsHistory({
         )}
       </div>
 
-      {history.length === 0 ? (
-        <div className="bg-slate-900 rounded-3xl p-6 border border-slate-800 text-slate-400">
-          Todavía no hay partidos cerrados.
-        </div>
-      ) : (
-        history.map(({ match, predictions }) => (
-          <div
-            key={match.id}
-            className="bg-slate-900 rounded-3xl p-5 md:p-6 border border-slate-800 shadow-2xl"
-          >
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
-              <div>
-                <h3 className="text-xl md:text-2xl font-black">
-                  {match.home} vs {match.away}
-                </h3>
+      <div>
+        <h2 className="text-2xl md:text-3xl font-black mb-4">
+          🔒 Pronósticos cerrados
+        </h2>
 
-                <p className="text-slate-400 text-sm">
-                  Grupo {match.group} · {match.date} · {match.time} UYT
-                </p>
+        <p className="text-slate-400 text-sm mb-4">
+          Partidos cuyo plazo ya cerró, aunque todavía no tengan resultado oficial.
+        </p>
 
-                {match.stadium && (
-                  <p className="text-slate-500 text-xs mt-1">
-                    🏟️ {match.stadium}
-                  </p>
-                )}
-              </div>
-
-              <div className="bg-gray-500/20 border border-gray-500 text-gray-300 px-3 py-1 rounded-xl text-xs font-bold w-fit">
-                🔒 Cerrado
-              </div>
-            </div>
-
-            {predictions.length === 0 ? (
-              <div className="text-slate-400 bg-slate-950 rounded-2xl p-4 border border-slate-800">
-                No hubo pronósticos para este partido.
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {predictions.map((prediction) => (
-                  <div
-                    key={prediction.userId}
-                    className="bg-slate-950 rounded-2xl p-4 border border-slate-800 flex justify-between items-center gap-4"
-                  >
-                    <div className="font-bold truncate">
-                      {prediction.userName}
-                    </div>
-
-                    <div className="text-xl font-black shrink-0">
-                      {prediction.homeScore} - {prediction.awayScore}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+        {closedHistory.length === 0 ? (
+          <div className="bg-slate-900 rounded-3xl p-6 border border-slate-800 text-slate-400">
+            No hay partidos cerrados pendientes de resultado.
           </div>
-        ))
-      )}
+        ) : (
+          <div className="space-y-4">
+            {closedHistory.map((item) => renderMatchBlock(item, false))}
+          </div>
+        )}
+      </div>
 
+      <div>
+        <h2 className="text-2xl md:text-3xl font-black mb-4">
+          📚 Historial de partidos finalizados
+        </h2>
+
+        <p className="text-slate-400 text-sm mb-4">
+          Acá quedan todos los partidos que ya tienen resultado oficial cargado.
+        </p>
+
+        {finishedHistory.length === 0 ? (
+          <div className="bg-slate-900 rounded-3xl p-6 border border-slate-800 text-slate-400">
+            Todavía no hay partidos finalizados con resultado oficial.
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {finishedHistory.map((item) => renderMatchBlock(item, true))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
