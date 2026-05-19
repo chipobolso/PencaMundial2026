@@ -303,7 +303,7 @@ function App() {
         )}
 
         {activeTab === "extras" && (
-          <ExtrasPanel user={user} />
+          <ExtrasPanel user={user} matches={allMatchesBase} />
         )}
 
         {activeTab === "historial" && (

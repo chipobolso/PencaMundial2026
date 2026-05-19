@@ -2,13 +2,53 @@ import { useEffect, useState } from "react"
 import { getUserExtras, saveUserExtras } from "../services/extras"
 import { teams } from "../data/fixtures"
 
-function ExtrasPanel({ user }) {
+function parseMatchDate(dateText, timeText) {
+  const months = {
+    Enero: 0,
+    Febrero: 1,
+    Marzo: 2,
+    Abril: 3,
+    Mayo: 4,
+    Junio: 5,
+    Julio: 6,
+    Agosto: 7,
+    Septiembre: 8,
+    Octubre: 9,
+    Noviembre: 10,
+    Diciembre: 11
+  }
+
+  const [day, monthName, year] = dateText.split(" ")
+  const [hour, minute] = timeText.split(":")
+
+  return new Date(
+    Number(year),
+    months[monthName],
+    Number(day),
+    Number(hour),
+    Number(minute)
+  )
+}
+
+function ExtrasPanel({ user, matches = [] }) {
   const [champion, setChampion] = useState("")
   const [topScorer, setTopScorer] = useState("")
   const [saved, setSaved] = useState(false)
   const [isLocked, setIsLocked] = useState(false)
   const [showCountdown, setShowCountdown] = useState(false)
   const [timeLeft, setTimeLeft] = useState("")
+
+  function getFirstMatchDate() {
+    if (!matches || matches.length === 0) {
+      return parseMatchDate("11 Junio 2026", "16:00")
+    }
+
+    const orderedMatches = [...matches].sort((a, b) => {
+      return parseMatchDate(a.date, a.time) - parseMatchDate(b.date, b.time)
+    })
+
+    return parseMatchDate(orderedMatches[0].date, orderedMatches[0].time)
+  }
 
   useEffect(() => {
     async function loadExtras() {
@@ -25,7 +65,7 @@ function ExtrasPanel({ user }) {
   }, [user.uid])
 
   useEffect(() => {
-    const firstMatchDate = new Date("2026-06-11T16:00:00-03:00")
+    const firstMatchDate = getFirstMatchDate()
     const lockTime = new Date(firstMatchDate.getTime() - 15 * 60 * 1000)
 
     function updateTimer() {
@@ -38,6 +78,8 @@ function ExtrasPanel({ user }) {
         setTimeLeft("00:00:00")
         return
       }
+
+      setIsLocked(false)
 
       if (diff <= 24 * 60 * 60 * 1000) {
         setShowCountdown(true)
@@ -57,7 +99,7 @@ function ExtrasPanel({ user }) {
     const interval = setInterval(updateTimer, 1000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [matches])
 
   async function handleSave(e) {
     e.preventDefault()
