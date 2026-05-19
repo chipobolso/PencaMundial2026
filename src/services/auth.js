@@ -5,7 +5,8 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut
+  signOut,
+  sendPasswordResetEmail
 } from "firebase/auth"
 
 import {
@@ -18,7 +19,6 @@ const auth = getAuth(app)
 
 export async function register(email, password, name, lastname) {
   const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-
   const user = userCredential.user
 
   await setDoc(doc(db, "users", user.uid), {
@@ -36,7 +36,6 @@ export async function register(email, password, name, lastname) {
 
 export async function login(email, password) {
   const userCredential = await signInWithEmailAndPassword(auth, email, password)
-
   const user = userCredential.user
 
   const userDoc = await getDoc(doc(db, "users", user.uid))
@@ -56,6 +55,10 @@ export async function login(email, password) {
     email: user.email,
     ...userData
   }
+}
+
+export async function resetPassword(email) {
+  await sendPasswordResetEmail(auth, email)
 }
 
 export function logout() {

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { login, register } from "../services/auth"
+import { login, register, resetPassword } from "../services/auth"
 
 function Login({ onLogin }) {
   const [name, setName] = useState("")
@@ -16,13 +16,11 @@ function Login({ onLogin }) {
     try {
       if (isRegister) {
         await register(email, password, name, lastname)
-
         setMessage("Usuario creado. Quedó pendiente de aprobación del administrador.")
         setIsRegister(false)
         setPassword("")
       } else {
         const userData = await login(email, password)
-
         localStorage.setItem("user", JSON.stringify(userData))
         onLogin(userData)
       }
@@ -31,15 +29,27 @@ function Login({ onLogin }) {
     }
   }
 
+  async function handleResetPassword() {
+    setMessage("")
+
+    if (!email) {
+      setMessage("Ingresá tu email y luego tocá 'Olvidé mi contraseña'.")
+      return
+    }
+
+    try {
+      await resetPassword(email)
+      setMessage("Te enviamos un correo para restablecer tu contraseña.")
+    } catch (error) {
+      setMessage("No pudimos enviar el correo. Verificá que el email sea correcto.")
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-white px-4 py-8 flex items-center justify-center">
-
       <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
 
-        {/* PANEL IZQUIERDO */}
         <div className="bg-gradient-to-br from-blue-700 via-sky-700 to-slate-900 rounded-3xl p-8 md:p-10 shadow-2xl border border-blue-400/30">
-
-          {/* COPA DEL MUNDO */}
           <div className="mb-6 flex justify-center lg:justify-start">
             <img
               src="/worldcup.png"
@@ -56,7 +66,6 @@ function Login({ onLogin }) {
             Estados Unidos · Canadá · México
           </p>
 
-          {/* BANDERAS */}
           <div className="grid grid-cols-3 gap-3 mb-8">
             <div className="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
               <div className="text-2xl mb-1">🇺🇸</div>
@@ -74,7 +83,6 @@ function Login({ onLogin }) {
             </div>
           </div>
 
-          {/* INFO */}
           <div className="space-y-3 text-sm md:text-base text-slate-200">
             <div className="bg-black/20 rounded-2xl p-4">
               ⚽ Completá tus pronósticos de la fase de grupos.
@@ -88,10 +96,8 @@ function Login({ onLogin }) {
               🏆 Ranking, premios, campeón y goleador incluidos.
             </div>
           </div>
-
         </div>
 
-        {/* FORMULARIO */}
         <form
           onSubmit={handleSubmit}
           className="bg-slate-900 p-8 md:p-10 rounded-3xl w-full shadow-2xl border border-slate-800"
@@ -142,9 +148,19 @@ function Login({ onLogin }) {
             placeholder="Contraseña"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full mb-6 p-4 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-blue-500"
+            className="w-full mb-4 p-4 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-blue-500"
             required
           />
+
+          {!isRegister && (
+            <button
+              type="button"
+              onClick={handleResetPassword}
+              className="w-full mb-6 text-sm text-blue-300 hover:text-blue-200 font-bold"
+            >
+              Olvidé mi contraseña
+            </button>
+          )}
 
           <button
             type="submit"
@@ -171,9 +187,7 @@ function Login({ onLogin }) {
               : "No tengo cuenta. Registrarme"}
           </p>
         </form>
-
       </div>
-
     </div>
   )
 }

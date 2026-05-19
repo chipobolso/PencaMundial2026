@@ -295,6 +295,36 @@ function App() {
                 Campeón correcto suma 20 puntos. Goleador correcto suma 15 puntos.
               </p>
             </div>
+
+            <div className="bg-slate-900 rounded-3xl p-4 md:p-6 border border-slate-800 shadow-2xl mb-6">
+              <h2 className="text-2xl md:text-3xl font-black mb-5">
+                📜 Reglas
+              </h2>
+
+              <div className="space-y-3 text-sm md:text-base text-slate-300">
+                <p>• Se podrá pronosticar cada partido hasta <b>15 minutos antes</b> de su inicio.</p>
+                <p>• Se podrá modificar el pronóstico las veces que se desee mientras esté abierto.</p>
+                <p>• Vencido el plazo, el partido quedará bloqueado automáticamente.</p>
+                <p>• Se podrá elegir <b>Campeón y Goleador</b> hasta 15 minutos antes del partido inaugural.</p>
+                <p>• Una vez cerrado ese plazo, Campeón y Goleador quedarán bloqueados indefectiblemente y serán visibles para todos en la pestaña <b>“Pronósticos”</b>, sección <b>“Campeón y Goleador”</b>.</p>
+                <p>• Los pronósticos de todos los usuarios serán visibles 15 minutos antes del inicio de cada partido en la pestaña <b>“Pronósticos”</b>, sección <b>“Pronósticos cerrados”</b>.</p>
+                <p>• En la sección <b>“Historial de partidos finalizados”</b> quedarán todos los partidos ya concluidos, junto con el pronóstico de cada usuario.</p>
+
+                <div className="pt-4 border-t border-slate-700">
+                  <p className="font-black text-white mb-2">
+                    En caso de empate en la tabla final, se definirá por:
+                  </p>
+
+                  <ol className="list-decimal list-inside space-y-1 text-slate-300">
+                    <li>Mayor cantidad de aciertos exactos.</li>
+                    <li>Mayor cantidad de aciertos de resultado.</li>
+                    <li>Quien haya acertado al Campeón.</li>
+                    <li>Quien haya acertado al Goleador.</li>
+                    <li>Sorteo o acuerdo de división entre las partes.</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
           </>
         )}
 
