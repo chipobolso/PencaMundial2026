@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { saveMatchResult, deleteMatchResult } from "../services/matches"
 import { resetWorldCup } from "../services/admin"
+import { downloadBackup } from "../services/backup"
 
 function AdminPanel({ matches, refreshResults }) {
   const [selectedMatchId, setSelectedMatchId] = useState(matches[0]?.id || "")
@@ -42,6 +43,10 @@ function AdminPanel({ matches, refreshResults }) {
     alert("Resultado oficial eliminado. El partido volvió a quedar sin resultado.")
   }
 
+  async function handleBackup() {
+    await downloadBackup()
+  }
+
   async function handleReset() {
     const firstConfirm = confirm("⚠️ Esto va a borrar pronósticos, resultados y extras. ¿Querés continuar?")
 
@@ -68,8 +73,21 @@ function AdminPanel({ matches, refreshResults }) {
       </h2>
 
       <p className="text-slate-400 mb-6">
-        Cargar o borrar resultados oficiales de los partidos.
+        Cargar resultados, borrar resultados y descargar backup.
       </p>
+
+      <div className="mb-6 bg-slate-950 border border-slate-800 rounded-2xl p-4">
+        <button
+          onClick={handleBackup}
+          className="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-2xl font-black w-full"
+        >
+          📥 Descargar backup JSON
+        </button>
+
+        <p className="text-xs text-slate-500 mt-2 text-center">
+          Descarga usuarios, pronósticos, extras y resultados oficiales.
+        </p>
+      </div>
 
       <form onSubmit={handleSave} className="grid md:grid-cols-5 gap-4 items-end">
 
