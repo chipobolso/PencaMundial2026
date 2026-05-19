@@ -206,7 +206,8 @@ function PredictionsHistory({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+
       <UpcomingMatchesPanel
         matches={matches}
         user={user}
@@ -216,20 +217,50 @@ function PredictionsHistory({
         userPredictions={userPredictions}
       />
 
-      <div className="bg-slate-900 rounded-3xl p-5 md:p-6 border border-slate-800 shadow-2xl">
-        <h2 className="text-2xl md:text-3xl font-black mb-2">
-          👀 Pronósticos
+      <section>
+        <h2 className="text-2xl md:text-3xl font-black mb-3">
+          🔒 Pronósticos cerrados
         </h2>
 
-        <p className="text-slate-400 text-sm">
-          Acá se muestran los pronósticos públicos una vez vencido el plazo de edición.
+        <p className="text-slate-400 text-sm mb-4">
+          Acá aparecen los partidos cuyo plazo ya cerró, pero que todavía no tienen resultado oficial cargado.
         </p>
-      </div>
 
-      <div className="bg-slate-900 rounded-3xl p-5 md:p-6 border border-slate-800 shadow-2xl">
-        <h3 className="text-xl md:text-2xl font-black mb-4">
+        {closedHistory.length === 0 ? (
+          <div className="bg-slate-900 rounded-3xl p-6 border border-slate-800 text-slate-400">
+            No hay partidos cerrados pendientes de resultado.
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {closedHistory.map((item) => renderMatchBlock(item, false))}
+          </div>
+        )}
+      </section>
+
+      <section>
+        <h2 className="text-2xl md:text-3xl font-black mb-3">
+          📚 Historial de partidos finalizados
+        </h2>
+
+        <p className="text-slate-400 text-sm mb-4">
+          Acá quedan todos los partidos que ya tienen resultado oficial cargado.
+        </p>
+
+        {finishedHistory.length === 0 ? (
+          <div className="bg-slate-900 rounded-3xl p-6 border border-slate-800 text-slate-400">
+            Todavía no hay partidos finalizados con resultado oficial.
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {finishedHistory.map((item) => renderMatchBlock(item, true))}
+          </div>
+        )}
+      </section>
+
+      <section className="bg-slate-900 rounded-3xl p-5 md:p-6 border border-slate-800 shadow-2xl">
+        <h2 className="text-2xl md:text-3xl font-black mb-4">
           ⭐ Campeón y goleador
-        </h3>
+        </h2>
 
         {!extrasLocked() ? (
           <div className="text-slate-400 bg-slate-950 rounded-2xl p-4 border border-slate-800">
@@ -237,7 +268,7 @@ function PredictionsHistory({
           </div>
         ) : extras.length === 0 ? (
           <div className="text-slate-400 bg-slate-950 rounded-2xl p-4 border border-slate-800">
-            Nadie cargó extras todavía.
+            Nadie cargó campeón y goleador todavía.
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -262,47 +293,8 @@ function PredictionsHistory({
             </table>
           </div>
         )}
-      </div>
+      </section>
 
-      <div>
-        <h2 className="text-2xl md:text-3xl font-black mb-4">
-          🔒 Pronósticos cerrados
-        </h2>
-
-        <p className="text-slate-400 text-sm mb-4">
-          Partidos cuyo plazo ya cerró, aunque todavía no tengan resultado oficial.
-        </p>
-
-        {closedHistory.length === 0 ? (
-          <div className="bg-slate-900 rounded-3xl p-6 border border-slate-800 text-slate-400">
-            No hay partidos cerrados pendientes de resultado.
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {closedHistory.map((item) => renderMatchBlock(item, false))}
-          </div>
-        )}
-      </div>
-
-      <div>
-        <h2 className="text-2xl md:text-3xl font-black mb-4">
-          📚 Historial de partidos finalizados
-        </h2>
-
-        <p className="text-slate-400 text-sm mb-4">
-          Acá quedan todos los partidos que ya tienen resultado oficial cargado.
-        </p>
-
-        {finishedHistory.length === 0 ? (
-          <div className="bg-slate-900 rounded-3xl p-6 border border-slate-800 text-slate-400">
-            Todavía no hay partidos finalizados con resultado oficial.
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {finishedHistory.map((item) => renderMatchBlock(item, true))}
-          </div>
-        )}
-      </div>
     </div>
   )
 }
