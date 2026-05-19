@@ -283,7 +283,7 @@ function App() {
 
                 <div className="bg-slate-800 rounded-2xl p-4">
                   <div className="text-slate-400 text-sm">Goles exactos</div>
-                  <div className="text-2xl md:text-3xl font-black text-purple-400">+1 c/u</div>
+                  <div className="text-2xl md:text-3xl font-black text-purple-400">1 punto</div>
                 </div>
               </div>
 

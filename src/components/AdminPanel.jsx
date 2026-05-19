@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { saveMatchResult } from "../services/matches"
+import { saveMatchResult, deleteMatchResult } from "../services/matches"
 import { resetWorldCup } from "../services/admin"
 
 function AdminPanel({ matches, refreshResults }) {
@@ -25,6 +25,21 @@ function AdminPanel({ matches, refreshResults }) {
     setTimeout(() => {
       setSaved(false)
     }, 2500)
+  }
+
+  async function handleDeleteResult() {
+    const confirmDelete = confirm("¿Seguro que querés borrar el resultado oficial de este partido?")
+
+    if (!confirmDelete) return
+
+    await deleteMatchResult(selectedMatchId)
+
+    setRealHome("")
+    setRealAway("")
+
+    await refreshResults()
+
+    alert("Resultado oficial eliminado. El partido volvió a quedar sin resultado.")
   }
 
   async function handleReset() {
@@ -53,7 +68,7 @@ function AdminPanel({ matches, refreshResults }) {
       </h2>
 
       <p className="text-slate-400 mb-6">
-        Cargar resultados reales de los partidos.
+        Cargar o borrar resultados oficiales de los partidos.
       </p>
 
       <form onSubmit={handleSave} className="grid md:grid-cols-5 gap-4 items-end">
@@ -120,6 +135,19 @@ function AdminPanel({ matches, refreshResults }) {
           Resultado guardado ✔
         </div>
       )}
+
+      <div className="mt-5">
+        <button
+          onClick={handleDeleteResult}
+          className="bg-slate-700 hover:bg-slate-600 px-6 py-3 rounded-2xl font-black w-full"
+        >
+          🧽 Borrar resultado del partido seleccionado
+        </button>
+
+        <p className="text-xs text-slate-500 mt-2 text-center">
+          Esto no borra pronósticos. Solo elimina el resultado oficial del partido.
+        </p>
+      </div>
 
       <div className="mt-8 border-t border-slate-700 pt-6">
         <button

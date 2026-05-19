@@ -5,16 +5,18 @@ import {
   setDoc,
   getDocs,
   collection,
-  serverTimestamp
+  deleteDoc
 } from "firebase/firestore"
 
 export async function saveMatchResult(matchId, result) {
   await setDoc(doc(db, "matchResults", matchId), {
-    matchId,
     realHome: result.realHome,
-    realAway: result.realAway,
-    updatedAt: serverTimestamp()
+    realAway: result.realAway
   })
+}
+
+export async function deleteMatchResult(matchId) {
+  await deleteDoc(doc(db, "matchResults", matchId))
 }
 
 export async function getMatchResults() {
@@ -23,8 +25,7 @@ export async function getMatchResults() {
   const results = {}
 
   snapshot.forEach((doc) => {
-    const data = doc.data()
-    results[data.matchId] = data
+    results[doc.id] = doc.data()
   })
 
   return results
