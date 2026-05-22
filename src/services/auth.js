@@ -19,6 +19,7 @@ const auth = getAuth(app)
 
 export async function register(email, password, name, lastname) {
   const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+
   const user = userCredential.user
 
   await setDoc(doc(db, "users", user.uid), {
@@ -36,6 +37,7 @@ export async function register(email, password, name, lastname) {
 
 export async function login(email, password) {
   const userCredential = await signInWithEmailAndPassword(auth, email, password)
+
   const user = userCredential.user
 
   const userDoc = await getDoc(doc(db, "users", user.uid))
@@ -45,6 +47,10 @@ export async function login(email, password) {
   }
 
   const userData = userDoc.data()
+
+  if (userData.status === "denied") {
+    throw new Error("Tu solicitud fue denegada. Contactá al administrador.")
+  }
 
   if (userData.status !== "approved") {
     throw new Error("Tu usuario todavía no fue aprobado por el administrador.")

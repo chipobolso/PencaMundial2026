@@ -22,3 +22,9 @@ export async function approveUser(userId) {
     status: "approved"
   })
 }
+
+export async function denyUser(userId) {
+  await updateDoc(doc(db, "users", userId), {
+    status: "denied"
+  })
+}
