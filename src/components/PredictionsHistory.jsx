@@ -42,6 +42,8 @@ function PredictionsHistory({
   const [closedHistory, setClosedHistory] = useState([])
   const [finishedHistory, setFinishedHistory] = useState([])
   const [extras, setExtras] = useState([])
+  const [expandedClosed, setExpandedClosed] = useState({})
+  const [expandedFinished, setExpandedFinished] = useState({})
 
   function isMatchLocked(match) {
     const matchDate = parseMatchDate(match.date, match.time)
@@ -111,6 +113,44 @@ function PredictionsHistory({
     loadHistory()
   }, [matches, matchResults])
 
+  function toggleClosed(matchId) {
+    setExpandedClosed((current) => ({
+      ...current,
+      [matchId]: !current[matchId]
+    }))
+  }
+
+  function toggleFinished(matchId) {
+    setExpandedFinished((current) => ({
+      ...current,
+      [matchId]: !current[matchId]
+    }))
+  }
+
+  function expandAllClosed() {
+    const next = {}
+    closedHistory.forEach(({ match }) => {
+      next[match.id] = true
+    })
+    setExpandedClosed(next)
+  }
+
+  function collapseAllClosed() {
+    setExpandedClosed({})
+  }
+
+  function expandAllFinished() {
+    const next = {}
+    finishedHistory.forEach(({ match }) => {
+      next[match.id] = true
+    })
+    setExpandedFinished(next)
+  }
+
+  function collapseAllFinished() {
+    setExpandedFinished({})
+  }
+
   function renderPredictionList(predictions, match) {
     if (predictions.length === 0) {
       return (
@@ -124,7 +164,7 @@ function PredictionsHistory({
     const matchHasResult = hasResult(match)
 
     return (
-      <div className="space-y-2">
+      <div className="grid md:grid-cols-2 gap-2 mt-4">
         {predictions.map((prediction) => {
           const points = matchHasResult
             ? calculateMatchPoints(
@@ -138,19 +178,19 @@ function PredictionsHistory({
           return (
             <div
               key={prediction.userId}
-              className="bg-slate-950 rounded-2xl p-4 border border-slate-800 flex justify-between items-center gap-4"
+              className="bg-slate-950 rounded-xl p-3 border border-slate-800 flex justify-between items-center gap-3 text-sm"
             >
               <div className="font-bold truncate">
                 {prediction.userName}
               </div>
 
-              <div className="flex items-center gap-3 shrink-0">
-                <div className="text-xl font-black">
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="font-black">
                   {prediction.homeScore} - {prediction.awayScore}
                 </div>
 
                 {matchHasResult && (
-                  <div className="bg-blue-600 px-3 py-1 rounded-xl text-sm font-black">
+                  <div className="bg-blue-600 px-2 py-1 rounded-lg text-xs font-black">
                     {points} pts
                   </div>
                 )}
@@ -162,45 +202,65 @@ function PredictionsHistory({
     )
   }
 
-  function renderMatchBlock({ match, predictions }, showOfficialResult = false) {
+  function renderMatchSummary({
+    item,
+    isExpanded,
+    onToggle,
+    showOfficialResult = false
+  }) {
+    const { match, predictions } = item
     const result = matchResults[match.id]
 
     return (
       <div
         key={match.id}
-        className="bg-slate-900 rounded-3xl p-5 md:p-6 border border-slate-800 shadow-2xl"
+        className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden"
       >
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
-          <div>
-            <h3 className="text-xl md:text-2xl font-black">
-              {match.home} vs {match.away}
-            </h3>
+        <button
+          type="button"
+          onClick={onToggle}
+          className="w-full p-4 md:p-5 text-left hover:bg-slate-800/60 transition"
+        >
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+              <h3 className="text-lg md:text-xl font-black">
+                {isExpanded ? "▼" : "▶"} {match.home} vs {match.away}
+              </h3>
 
-            <p className="text-slate-400 text-sm">
-              Grupo {match.group} · {match.date} · {match.time} UYT
-            </p>
-
-            {match.stadium && (
-              <p className="text-slate-500 text-xs mt-1">
-                🏟️ {match.stadium}
+              <p className="text-slate-400 text-xs md:text-sm mt-1">
+                Grupo {match.group} · {match.date} · {match.time} UYT
               </p>
-            )}
-          </div>
 
-          <div className="flex flex-col md:items-end gap-2">
-            <div className="bg-gray-500/20 border border-gray-500 text-gray-300 px-3 py-1 rounded-xl text-xs font-bold w-fit">
-              🔒 Cerrado
+              {match.stadium && (
+                <p className="text-slate-500 text-xs mt-1">
+                  🏟️ {match.stadium}
+                </p>
+              )}
             </div>
 
-            {showOfficialResult && result && (
-              <div className="bg-emerald-500/10 border border-emerald-500/40 text-emerald-300 px-3 py-1 rounded-xl text-xs font-black w-fit">
-                Resultado: {result.realHome} - {result.realAway}
+            <div className="flex flex-wrap md:justify-end gap-2">
+              <div className="bg-slate-800 border border-slate-700 text-slate-300 px-3 py-1 rounded-xl text-xs font-bold">
+                👥 {predictions.length} pronósticos
               </div>
-            )}
-          </div>
-        </div>
 
-        {renderPredictionList(predictions, match)}
+              <div className="bg-gray-500/20 border border-gray-500 text-gray-300 px-3 py-1 rounded-xl text-xs font-bold">
+                🔒 Cerrado
+              </div>
+
+              {showOfficialResult && result && (
+                <div className="bg-emerald-500/10 border border-emerald-500/40 text-emerald-300 px-3 py-1 rounded-xl text-xs font-black">
+                  Resultado: {result.realHome} - {result.realAway}
+                </div>
+              )}
+            </div>
+          </div>
+        </button>
+
+        {isExpanded && (
+          <div className="px-4 md:px-5 pb-5">
+            {renderPredictionList(predictions, match)}
+          </div>
+        )}
       </div>
     )
   }
@@ -218,41 +278,99 @@ function PredictionsHistory({
       />
 
       <section>
-        <h2 className="text-2xl md:text-3xl font-black mb-3">
-          🔒 Pronósticos cerrados
-        </h2>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-4">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-black mb-2">
+              🔒 Pronósticos cerrados
+            </h2>
 
-        <p className="text-slate-400 text-sm mb-4">
-          Acá aparecen los partidos cuyo plazo ya cerró, pero que todavía no tienen resultado oficial cargado.
-        </p>
+            <p className="text-slate-400 text-sm">
+              Acá aparecen los partidos cuyo plazo ya cerró, pero que todavía no tienen resultado oficial cargado.
+            </p>
+          </div>
+
+          {closedHistory.length > 0 && (
+            <div className="flex gap-2">
+              <button
+                onClick={expandAllClosed}
+                className="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-xl text-xs font-black"
+              >
+                Expandir todos
+              </button>
+
+              <button
+                onClick={collapseAllClosed}
+                className="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-xl text-xs font-black"
+              >
+                Contraer todos
+              </button>
+            </div>
+          )}
+        </div>
 
         {closedHistory.length === 0 ? (
           <div className="bg-slate-900 rounded-3xl p-6 border border-slate-800 text-slate-400">
             No hay partidos cerrados pendientes de resultado.
           </div>
         ) : (
-          <div className="space-y-4">
-            {closedHistory.map((item) => renderMatchBlock(item, false))}
+          <div className="space-y-3">
+            {closedHistory.map((item) =>
+              renderMatchSummary({
+                item,
+                isExpanded: !!expandedClosed[item.match.id],
+                onToggle: () => toggleClosed(item.match.id),
+                showOfficialResult: false
+              })
+            )}
           </div>
         )}
       </section>
 
       <section>
-        <h2 className="text-2xl md:text-3xl font-black mb-3">
-          📚 Historial de partidos finalizados
-        </h2>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-4">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-black mb-2">
+              📚 Historial de partidos finalizados
+            </h2>
 
-        <p className="text-slate-400 text-sm mb-4">
-          Acá quedan todos los partidos que ya tienen resultado oficial cargado.
-        </p>
+            <p className="text-slate-400 text-sm">
+              Acá quedan todos los partidos que ya tienen resultado oficial cargado.
+            </p>
+          </div>
+
+          {finishedHistory.length > 0 && (
+            <div className="flex gap-2">
+              <button
+                onClick={expandAllFinished}
+                className="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-xl text-xs font-black"
+              >
+                Expandir todos
+              </button>
+
+              <button
+                onClick={collapseAllFinished}
+                className="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-xl text-xs font-black"
+              >
+                Contraer todos
+              </button>
+            </div>
+          )}
+        </div>
 
         {finishedHistory.length === 0 ? (
           <div className="bg-slate-900 rounded-3xl p-6 border border-slate-800 text-slate-400">
             Todavía no hay partidos finalizados con resultado oficial.
           </div>
         ) : (
-          <div className="space-y-4">
-            {finishedHistory.map((item) => renderMatchBlock(item, true))}
+          <div className="space-y-3">
+            {finishedHistory.map((item) =>
+              renderMatchSummary({
+                item,
+                isExpanded: !!expandedFinished[item.match.id],
+                onToggle: () => toggleFinished(item.match.id),
+                showOfficialResult: true
+              })
+            )}
           </div>
         )}
       </section>
