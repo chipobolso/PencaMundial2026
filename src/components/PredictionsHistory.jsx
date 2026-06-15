@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
-import { getPredictionsByMatch } from "../services/predictions"
+import { getPredictionsByMatchOptimized } from "../services/predictions"
 import { getAllExtras } from "../services/extras"
+import { db } from "../services/firebase"
+import { collection, getDocs } from "firebase/firestore"
 import UpcomingMatchesPanel from "./UpcomingMatchesPanel"
 
 function parseMatchDate(dateText, timeText) {
@@ -44,6 +46,7 @@ function PredictionsHistory({
   const [extras, setExtras] = useState([])
   const [expandedClosed, setExpandedClosed] = useState({})
   const [expandedFinished, setExpandedFinished] = useState({})
+  const [loadingHistory, setLoadingHistory] = useState(true)
 
   function isMatchLocked(match) {
     const matchDate = parseMatchDate(match.date, match.time)
@@ -77,29 +80,49 @@ function PredictionsHistory({
     return new Date() >= lockTime
   }
 
+  async function getUsersMap() {
+    const snapshot = await getDocs(collection(db, "users"))
+    const usersMap = {}
+
+    snapshot.forEach((userDoc) => {
+      const userData = userDoc.data()
+      usersMap[userData.uid] = `${userData.name} ${userData.lastname}`
+    })
+
+    return usersMap
+  }
+
   useEffect(() => {
     async function loadHistory() {
+      setLoadingHistory(true)
+
       const closedMatches = matches
         .filter(isMatchLocked)
         .sort((a, b) => parseMatchDate(b.date, b.time) - parseMatchDate(a.date, a.time))
 
+      const usersMap = await getUsersMap()
+
+      const items = await Promise.all(
+        closedMatches.map(async (match) => {
+          const predictions = await getPredictionsByMatchOptimized(match.id, usersMap)
+
+          return {
+            match,
+            predictions
+          }
+        })
+      )
+
       const closedWithoutResult = []
       const finishedWithResult = []
 
-      for (const match of closedMatches) {
-        const predictions = await getPredictionsByMatch(match.id)
-
-        const item = {
-          match,
-          predictions
-        }
-
-        if (hasResult(match)) {
+      items.forEach((item) => {
+        if (hasResult(item.match)) {
           finishedWithResult.push(item)
         } else {
           closedWithoutResult.push(item)
         }
-      }
+      })
 
       setClosedHistory(closedWithoutResult)
       setFinishedHistory(finishedWithResult)
@@ -108,6 +131,8 @@ function PredictionsHistory({
         const allExtras = await getAllExtras()
         setExtras(allExtras)
       }
+
+      setLoadingHistory(false)
     }
 
     loadHistory()
@@ -276,6 +301,12 @@ function PredictionsHistory({
         showToast={showToast}
         userPredictions={userPredictions}
       />
+
+      {loadingHistory && (
+        <div className="bg-slate-900 rounded-3xl p-5 border border-slate-800 text-slate-400">
+          Cargando pronósticos...
+        </div>
+      )}
 
       <section>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-4">

@@ -14,9 +14,19 @@ import {
 export async function savePrediction(userId, matchId, prediction) {
   const predictionId = `${userId}_${matchId}`
 
+  const userSnap = await getDoc(doc(db, "users", userId))
+
+  let userName = "Usuario sin nombre"
+
+  if (userSnap.exists()) {
+    const userData = userSnap.data()
+    userName = `${userData.name} ${userData.lastname}`
+  }
+
   await setDoc(doc(db, "predictions", predictionId), {
     userId,
     matchId,
+    userName,
     home: prediction.home,
     away: prediction.away,
     homeScore: prediction.homeScore,
@@ -45,24 +55,35 @@ export async function getPredictionsByMatch(matchId) {
   const snapshot = await getDocs(q)
   const predictions = []
 
-  for (const predictionDoc of snapshot.docs) {
+  snapshot.forEach((predictionDoc) => {
     const prediction = predictionDoc.data()
-
-    const userRef = doc(db, "users", prediction.userId)
-    const userSnap = await getDoc(userRef)
-
-    let userName = "Usuario sin nombre"
-
-    if (userSnap.exists()) {
-      const userData = userSnap.data()
-      userName = `${userData.name} ${userData.lastname}`
-    }
 
     predictions.push({
       ...prediction,
-      userName
+      userName: prediction.userName || "Usuario sin nombre"
     })
-  }
+  })
+
+  return predictions
+}
+
+export async function getPredictionsByMatchOptimized(matchId, usersMap) {
+  const predictionsRef = collection(db, "predictions")
+  const q = query(predictionsRef, where("matchId", "==", matchId))
+
+  const snapshot = await getDocs(q)
+  const predictions = []
+
+  snapshot.forEach((predictionDoc) => {
+    const prediction = predictionDoc.data()
+
+    const fallbackUserName = usersMap[prediction.userId] || "Usuario sin nombre"
+
+    predictions.push({
+      ...prediction,
+      userName: prediction.userName || fallbackUserName
+    })
+  })
 
   return predictions
 }
