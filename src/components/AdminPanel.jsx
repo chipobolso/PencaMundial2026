@@ -1,23 +1,85 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { saveMatchResult, deleteMatchResult } from "../services/matches"
 import { resetWorldCup } from "../services/admin"
 import { downloadBackup } from "../services/backup"
 
-function AdminPanel({ matches, refreshResults }) {
+function AdminPanel({ matches, matchResults, refreshResults }) {
   const [selectedMatchId, setSelectedMatchId] = useState(matches[0]?.id || "")
   const [realHome, setRealHome] = useState("")
   const [realAway, setRealAway] = useState("")
   const [saved, setSaved] = useState(false)
 
+  function hasResult(match, results = matchResults) {
+    const result = results[match.id]
+
+    return (
+      result?.realHome !== "" &&
+      result?.realAway !== "" &&
+      result?.realHome !== undefined &&
+      result?.realAway !== undefined
+    )
+  }
+
+  const completedMatches = matches.filter((match) => hasResult(match)).length
+  const pendingMatches = matches.length - completedMatches
+
+  const orderedMatches = [...matches].sort((a, b) => {
+    const aDone = hasResult(a)
+    const bDone = hasResult(b)
+
+    if (aDone === bDone) return 0
+    return aDone ? 1 : -1
+  })
+
   const selectedMatch = matches.find((match) => match.id === selectedMatchId)
+
+  useEffect(() => {
+    const result = matchResults[selectedMatchId]
+
+    if (
+      result?.realHome !== "" &&
+      result?.realAway !== "" &&
+      result?.realHome !== undefined &&
+      result?.realAway !== undefined
+    ) {
+      setRealHome(result.realHome)
+      setRealAway(result.realAway)
+    } else {
+      setRealHome("")
+      setRealAway("")
+    }
+  }, [selectedMatchId, matchResults])
+
+  function goToNextPending(results = matchResults) {
+    const nextPending = matches.find((match) => !hasResult(match, results))
+
+    if (nextPending) {
+      setSelectedMatchId(nextPending.id)
+    } else {
+      alert("No quedan partidos pendientes de resultado.")
+    }
+  }
 
   async function handleSave(e) {
     e.preventDefault()
+
+    if (realHome === "" || realAway === "") {
+      alert("Tenés que ingresar los goles de ambos equipos.")
+      return
+    }
 
     await saveMatchResult(selectedMatchId, {
       realHome,
       realAway
     })
+
+    const updatedResults = {
+      ...matchResults,
+      [selectedMatchId]: {
+        realHome,
+        realAway
+      }
+    }
 
     await refreshResults()
 
@@ -26,6 +88,8 @@ function AdminPanel({ matches, refreshResults }) {
     setTimeout(() => {
       setSaved(false)
     }, 2500)
+
+    goToNextPending(updatedResults)
   }
 
   async function handleDeleteResult() {
@@ -89,6 +153,37 @@ function AdminPanel({ matches, refreshResults }) {
         </p>
       </div>
 
+      <div className="mb-6 bg-slate-950 border border-slate-800 rounded-2xl p-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-center">
+          <div className="bg-slate-800 rounded-2xl p-4">
+            <div className="text-slate-400 text-sm">Total partidos</div>
+            <div className="text-2xl font-black">{matches.length}</div>
+          </div>
+
+          <div className="bg-green-500/10 border border-green-500/40 rounded-2xl p-4">
+            <div className="text-slate-400 text-sm">Cargados</div>
+            <div className="text-2xl font-black text-green-300">
+              {completedMatches}
+            </div>
+          </div>
+
+          <div className="bg-yellow-500/10 border border-yellow-500/40 rounded-2xl p-4">
+            <div className="text-slate-400 text-sm">Pendientes</div>
+            <div className="text-2xl font-black text-yellow-300">
+              {pendingMatches}
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => goToNextPending()}
+          className="mt-4 bg-purple-600 hover:bg-purple-500 px-6 py-3 rounded-2xl font-black w-full"
+        >
+          ▶ Siguiente pendiente
+        </button>
+      </div>
+
       <form onSubmit={handleSave} className="grid md:grid-cols-5 gap-4 items-end">
 
         <div className="md:col-span-2">
@@ -101,11 +196,18 @@ function AdminPanel({ matches, refreshResults }) {
             onChange={(e) => setSelectedMatchId(e.target.value)}
             className="w-full p-4 rounded-xl bg-slate-800 border border-slate-700"
           >
-            {matches.map((match) => (
-              <option key={match.id} value={match.id}>
-                {match.id} - {match.home} vs {match.away}
-              </option>
-            ))}
+            {orderedMatches.map((match) => {
+              const result = matchResults[match.id]
+              const done = hasResult(match)
+
+              return (
+                <option key={match.id} value={match.id}>
+                  {done
+                    ? `✅ ${match.id} - ${match.home} ${result.realHome}-${result.realAway} ${match.away}`
+                    : `⏳ ${match.id} - ${match.home} vs ${match.away}`}
+                </option>
+              )
+            })}
           </select>
         </div>
 
@@ -151,6 +253,28 @@ function AdminPanel({ matches, refreshResults }) {
       {saved && (
         <div className="mt-4 bg-green-500/20 border border-green-500 text-green-300 rounded-xl p-3 font-bold">
           Resultado guardado ✔
+        </div>
+      )}
+
+      {selectedMatch && (
+        <div className="mt-5 bg-slate-950 border border-slate-800 rounded-2xl p-4 text-center">
+          <div className="text-slate-400 text-sm mb-1">
+            Partido seleccionado
+          </div>
+
+          <div className="font-black text-lg">
+            {selectedMatch.id} - {selectedMatch.home} vs {selectedMatch.away}
+          </div>
+
+          {hasResult(selectedMatch) ? (
+            <div className="mt-2 text-green-300 font-black">
+              ✅ Resultado cargado: {matchResults[selectedMatch.id].realHome} - {matchResults[selectedMatch.id].realAway}
+            </div>
+          ) : (
+            <div className="mt-2 text-yellow-300 font-black">
+              ⏳ Resultado pendiente
+            </div>
+          )}
         </div>
       )}
 

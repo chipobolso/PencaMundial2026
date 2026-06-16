@@ -367,6 +367,7 @@ function App() {
 
             <AdminPanel
               matches={allMatchesBase}
+              matchResults={matchResults}
               refreshResults={refreshResults}
             />
 
