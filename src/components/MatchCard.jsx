@@ -76,6 +76,16 @@ function MatchCard(props) {
   async function handleSave() {
     if (isLocked) return
 
+    if (homeScore === "" || awayScore === "") {
+      if (props.showToast) {
+        props.showToast("Debés ingresar los goles de ambos equipos")
+      } else {
+        alert("Debés ingresar los goles de ambos equipos")
+      }
+
+      return
+    }
+
     await savePrediction(props.user.uid, props.matchId, {
       home: props.home,
       away: props.away,
