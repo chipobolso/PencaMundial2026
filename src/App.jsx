@@ -132,7 +132,7 @@ function App() {
 
     const interval = setInterval(() => {
       loadData()
-    }, 30000)
+    }, 5000)
 
     return () => clearInterval(interval)
   }, [user])
