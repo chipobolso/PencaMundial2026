@@ -11,67 +11,89 @@ import { calculateMatchPoints } from "./scoring"
 import { normalizeText } from "./normalize"
 
 export async function getRanking(allMatches) {
-  const usersSnapshot = await getDocs(collection(db, "users"))
-  const predictionsSnapshot = await getDocs(collection(db, "predictions"))
-  const extrasSnapshot = await getDocs(collection(db, "extras"))
-  const officialExtrasSnap = await getDoc(doc(db, "matchResults", "EXTRAS_FINAL"))
+  const [
+    usersSnapshot,
+    predictionsSnapshot,
+    extrasSnapshot,
+    officialExtrasSnap
+  ] = await Promise.all([
+    getDocs(collection(db, "users")),
+    getDocs(collection(db, "predictions")),
+    getDocs(collection(db, "extras")),
+    getDoc(doc(db, "matchResults", "EXTRAS_FINAL"))
+  ])
 
   const users = []
-  const predictions = []
-  const extras = []
+  const predictionsByUser = {}
+  const extrasByUser = {}
+  const matchesById = {}
 
-  usersSnapshot.forEach((doc) => {
-    const user = doc.data()
+  allMatches.forEach((match) => {
+    matchesById[match.id] = match
+  })
+
+  usersSnapshot.forEach((docSnap) => {
+    const user = docSnap.data()
 
     if (user.status === "approved") {
       users.push(user)
     }
   })
 
-  predictionsSnapshot.forEach((doc) => {
-    predictions.push(doc.data())
+  predictionsSnapshot.forEach((docSnap) => {
+    const prediction = docSnap.data()
+
+    if (!predictionsByUser[prediction.userId]) {
+      predictionsByUser[prediction.userId] = []
+    }
+
+    predictionsByUser[prediction.userId].push(prediction)
   })
 
-  extrasSnapshot.forEach((doc) => {
-    extras.push(doc.data())
+  extrasSnapshot.forEach((docSnap) => {
+    const extra = docSnap.data()
+    extrasByUser[extra.userId] = extra
   })
 
   const officialExtras = officialExtrasSnap.exists()
     ? officialExtrasSnap.data()
     : null
 
+  const officialChampion = officialExtras
+    ? normalizeText(officialExtras.realHome)
+    : ""
+
+  const officialTopScorer = officialExtras
+    ? normalizeText(officialExtras.realAway)
+    : ""
+
   const ranking = users.map((user) => {
     let points = 0
 
-    predictions
-      .filter((prediction) => prediction.userId === user.uid)
-      .forEach((prediction) => {
-        const match = allMatches.find(
-          (match) => match.id === prediction.matchId
+    const userPredictions = predictionsByUser[user.uid] || []
+
+    userPredictions.forEach((prediction) => {
+      const match = matchesById[prediction.matchId]
+
+      if (
+        match &&
+        match.realHome !== "" &&
+        match.realAway !== "" &&
+        match.realHome !== undefined &&
+        match.realAway !== undefined
+      ) {
+        points += calculateMatchPoints(
+          prediction.homeScore,
+          prediction.awayScore,
+          match.realHome,
+          match.realAway
         )
+      }
+    })
 
-        if (
-          match &&
-          match.realHome !== "" &&
-          match.realAway !== "" &&
-          match.realHome !== undefined &&
-          match.realAway !== undefined
-        ) {
-          points += calculateMatchPoints(
-            prediction.homeScore,
-            prediction.awayScore,
-            match.realHome,
-            match.realAway
-          )
-        }
-      })
-
-    const userExtras = extras.find((extra) => extra.userId === user.uid)
+    const userExtras = extrasByUser[user.uid]
 
     if (officialExtras && userExtras) {
-      const officialChampion = normalizeText(officialExtras.realHome)
-      const officialTopScorer = normalizeText(officialExtras.realAway)
-
       const userChampion = normalizeText(userExtras.champion)
       const userTopScorer = normalizeText(userExtras.topScorer)
 
