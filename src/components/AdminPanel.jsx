@@ -48,7 +48,7 @@ function AdminPanel({ matches, matchResults, refreshResults }) {
       setRealHome("")
       setRealAway("")
     }
-  }, [selectedMatchId, matchResults])
+  }, [selectedMatchId])
 
   function goToNextPending(results = matchResults) {
     const nextPending = matches.find((match) => !hasResult(match, results))
