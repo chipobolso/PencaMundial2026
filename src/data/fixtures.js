@@ -30,7 +30,7 @@ export const groups = {
     { id: "D1", group: "D", date: "12 Junio 2026", time: "22:00", home: "Estados Unidos", away: "Paraguay", stadium: "Estadio Los Ángeles" },
     { id: "D2", group: "D", date: "14 Junio 2026", time: "01:00", home: "Australia", away: "Turquía", stadium: "Estadio BC Place Vancouver" },
     { id: "D3", group: "D", date: "19 Junio 2026", time: "16:00", home: "Estados Unidos", away: "Australia", stadium: "Estadio Seattle" },
-    { id: "D4", group: "D", date: "20 Junio 2026", time: "01:00", home: "Turquía", away: "Paraguay", stadium: "Estadio Bahía de San Francisco" },
+    { id: "D4", group: "D", date: "20 Junio 2026", time: "00:00", home: "Turquía", away: "Paraguay", stadium: "Estadio Bahía de San Francisco" },
     { id: "D5", group: "D", date: "25 Junio 2026", time: "23:00", home: "Turquía", away: "Estados Unidos", stadium: "Estadio Los Ángeles" },
     { id: "D6", group: "D", date: "25 Junio 2026", time: "23:00", home: "Paraguay", away: "Australia", stadium: "Estadio Bahía de San Francisco" }
   ],
