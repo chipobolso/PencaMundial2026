@@ -21,7 +21,7 @@ export const groups = {
     { id: "C1", group: "C", date: "13 Junio 2026", time: "19:00", home: "Brasil", away: "Marruecos", stadium: "Estadio Nueva York Nueva Jersey" },
     { id: "C2", group: "C", date: "13 Junio 2026", time: "22:00", home: "Haití", away: "Escocia", stadium: "Estadio Boston" },
     { id: "C3", group: "C", date: "19 Junio 2026", time: "19:00", home: "Escocia", away: "Marruecos", stadium: "Estadio Boston" },
-    { id: "C4", group: "C", date: "19 Junio 2026", time: "22:00", home: "Brasil", away: "Haití", stadium: "Estadio Filadelfia" },
+    { id: "C4", group: "C", date: "19 Junio 2026", time: "21:30", home: "Brasil", away: "Haití", stadium: "Estadio Filadelfia" },
     { id: "C5", group: "C", date: "24 Junio 2026", time: "19:00", home: "Escocia", away: "Brasil", stadium: "Estadio Miami" },
     { id: "C6", group: "C", date: "24 Junio 2026", time: "19:00", home: "Marruecos", away: "Haití", stadium: "Estadio Atlanta" }
   ],
