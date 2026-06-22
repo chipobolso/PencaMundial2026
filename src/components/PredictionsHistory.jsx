@@ -47,6 +47,7 @@ function PredictionsHistory({
   const [expandedClosed, setExpandedClosed] = useState({})
   const [expandedFinished, setExpandedFinished] = useState({})
   const [loadingHistory, setLoadingHistory] = useState(true)
+  const [finishedVisibleCount, setFinishedVisibleCount] = useState(5)
 
   function isMatchLocked(match) {
     const matchDate = parseMatchDate(match.date, match.time)
@@ -166,7 +167,7 @@ function PredictionsHistory({
 
   function expandAllFinished() {
     const next = {}
-    finishedHistory.forEach(({ match }) => {
+    finishedHistory.slice(0, finishedVisibleCount).forEach(({ match }) => {
       next[match.id] = true
     })
     setExpandedFinished(next)
@@ -290,6 +291,9 @@ function PredictionsHistory({
     )
   }
 
+  const visibleFinishedHistory = finishedHistory.slice(0, finishedVisibleCount)
+  const hasMoreFinished = finishedVisibleCount < finishedHistory.length
+
   return (
     <div className="space-y-8">
 
@@ -365,17 +369,17 @@ function PredictionsHistory({
             </h2>
 
             <p className="text-slate-400 text-sm">
-              Acá quedan todos los partidos que ya tienen resultado oficial cargado.
+              Mostrando {Math.min(finishedVisibleCount, finishedHistory.length)} de {finishedHistory.length} partidos finalizados.
             </p>
           </div>
 
           {finishedHistory.length > 0 && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <button
                 onClick={expandAllFinished}
                 className="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-xl text-xs font-black"
               >
-                Expandir todos
+                Expandir visibles
               </button>
 
               <button
@@ -393,16 +397,50 @@ function PredictionsHistory({
             Todavía no hay partidos finalizados con resultado oficial.
           </div>
         ) : (
-          <div className="space-y-3">
-            {finishedHistory.map((item) =>
-              renderMatchSummary({
-                item,
-                isExpanded: !!expandedFinished[item.match.id],
-                onToggle: () => toggleFinished(item.match.id),
-                showOfficialResult: true
-              })
-            )}
-          </div>
+          <>
+            <div className="space-y-3">
+              {visibleFinishedHistory.map((item) =>
+                renderMatchSummary({
+                  item,
+                  isExpanded: !!expandedFinished[item.match.id],
+                  onToggle: () => toggleFinished(item.match.id),
+                  showOfficialResult: true
+                })
+              )}
+            </div>
+
+            <div className="mt-5 flex flex-col md:flex-row gap-3">
+              {hasMoreFinished && (
+                <button
+                  onClick={() => setFinishedVisibleCount((current) => current + 5)}
+                  className="bg-blue-600 hover:bg-blue-500 px-5 py-3 rounded-2xl font-black w-full md:w-auto"
+                >
+                  Ver 5 más
+                </button>
+              )}
+
+              {hasMoreFinished && (
+                <button
+                  onClick={() => setFinishedVisibleCount(finishedHistory.length)}
+                  className="bg-slate-800 hover:bg-slate-700 px-5 py-3 rounded-2xl font-black w-full md:w-auto"
+                >
+                  Ver todos
+                </button>
+              )}
+
+              {finishedVisibleCount > 5 && (
+                <button
+                  onClick={() => {
+                    setFinishedVisibleCount(5)
+                    setExpandedFinished({})
+                  }}
+                  className="bg-slate-700 hover:bg-slate-600 px-5 py-3 rounded-2xl font-black w-full md:w-auto"
+                >
+                  Contraer historial
+                </button>
+              )}
+            </div>
+          </>
         )}
       </section>
 
