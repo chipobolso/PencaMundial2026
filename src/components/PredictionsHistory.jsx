@@ -52,7 +52,6 @@ function PredictionsHistory({
   function isMatchLocked(match) {
     const matchDate = parseMatchDate(match.date, match.time)
     const lockTime = new Date(matchDate.getTime() - 15 * 60 * 1000)
-
     return new Date() >= lockTime
   }
 
@@ -93,6 +92,36 @@ function PredictionsHistory({
     return usersMap
   }
 
+  async function loadPredictionsForItems(items, setStateFunction) {
+    if (items.length === 0) return
+
+    const usersMap = await getUsersMap()
+
+    const loadedItems = await Promise.all(
+      items.map(async (item) => {
+        if (item.predictionsLoaded) return item
+
+        const predictions = await getPredictionsByMatchOptimized(item.match.id, usersMap)
+
+        return {
+          ...item,
+          predictions,
+          predictionsLoaded: true
+        }
+      })
+    )
+
+    setStateFunction((currentItems) =>
+      currentItems.map((currentItem) => {
+        const loadedItem = loadedItems.find(
+          (item) => item.match.id === currentItem.match.id
+        )
+
+        return loadedItem || currentItem
+      })
+    )
+  }
+
   useEffect(() => {
     async function loadHistory() {
       setLoadingHistory(true)
@@ -101,24 +130,17 @@ function PredictionsHistory({
         .filter(isMatchLocked)
         .sort((a, b) => parseMatchDate(b.date, b.time) - parseMatchDate(a.date, a.time))
 
-      const usersMap = await getUsersMap()
-
-      const items = await Promise.all(
-        closedMatches.map(async (match) => {
-          const predictions = await getPredictionsByMatchOptimized(match.id, usersMap)
-
-          return {
-            match,
-            predictions
-          }
-        })
-      )
-
       const closedWithoutResult = []
       const finishedWithResult = []
 
-      items.forEach((item) => {
-        if (hasResult(item.match)) {
+      closedMatches.forEach((match) => {
+        const item = {
+          match,
+          predictions: [],
+          predictionsLoaded: false
+        }
+
+        if (hasResult(match)) {
           finishedWithResult.push(item)
         } else {
           closedWithoutResult.push(item)
@@ -127,6 +149,9 @@ function PredictionsHistory({
 
       setClosedHistory(closedWithoutResult)
       setFinishedHistory(finishedWithResult)
+
+      await loadPredictionsForItems(closedWithoutResult, setClosedHistory)
+      await loadPredictionsForItems(finishedWithResult.slice(0, 5), setFinishedHistory)
 
       if (extrasLocked()) {
         const allExtras = await getAllExtras()
@@ -138,6 +163,21 @@ function PredictionsHistory({
 
     loadHistory()
   }, [matches, matchResults])
+
+  async function showMoreFinished() {
+    const newCount = Math.min(finishedVisibleCount + 5, finishedHistory.length)
+    const itemsToLoad = finishedHistory.slice(finishedVisibleCount, newCount)
+
+    await loadPredictionsForItems(itemsToLoad, setFinishedHistory)
+    setFinishedVisibleCount(newCount)
+  }
+
+  async function showAllFinished() {
+    const itemsToLoad = finishedHistory.slice(finishedVisibleCount)
+
+    await loadPredictionsForItems(itemsToLoad, setFinishedHistory)
+    setFinishedVisibleCount(finishedHistory.length)
+  }
 
   function toggleClosed(matchId) {
     setExpandedClosed((current) => ({
@@ -177,7 +217,15 @@ function PredictionsHistory({
     setExpandedFinished({})
   }
 
-  function renderPredictionList(predictions, match) {
+  function renderPredictionList(predictions, match, predictionsLoaded) {
+    if (!predictionsLoaded) {
+      return (
+        <div className="text-slate-400 bg-slate-950 rounded-2xl p-4 border border-slate-800">
+          Cargando pronósticos...
+        </div>
+      )
+    }
+
     if (predictions.length === 0) {
       return (
         <div className="text-slate-400 bg-slate-950 rounded-2xl p-4 border border-slate-800">
@@ -234,7 +282,7 @@ function PredictionsHistory({
     onToggle,
     showOfficialResult = false
   }) {
-    const { match, predictions } = item
+    const { match, predictions, predictionsLoaded } = item
     const result = matchResults[match.id]
 
     return (
@@ -266,7 +314,7 @@ function PredictionsHistory({
 
             <div className="flex flex-wrap md:justify-end gap-2">
               <div className="bg-slate-800 border border-slate-700 text-slate-300 px-3 py-1 rounded-xl text-xs font-bold">
-                👥 {predictions.length} pronósticos
+                👥 {predictionsLoaded ? `${predictions.length} pronósticos` : "Sin cargar"}
               </div>
 
               <div className="bg-gray-500/20 border border-gray-500 text-gray-300 px-3 py-1 rounded-xl text-xs font-bold">
@@ -284,7 +332,7 @@ function PredictionsHistory({
 
         {isExpanded && (
           <div className="px-4 md:px-5 pb-5">
-            {renderPredictionList(predictions, match)}
+            {renderPredictionList(predictions, match, predictionsLoaded)}
           </div>
         )}
       </div>
@@ -308,7 +356,7 @@ function PredictionsHistory({
 
       {loadingHistory && (
         <div className="bg-slate-900 rounded-3xl p-5 border border-slate-800 text-slate-400">
-          Cargando pronósticos...
+          Cargando últimos pronósticos...
         </div>
       )}
 
@@ -412,7 +460,7 @@ function PredictionsHistory({
             <div className="mt-5 flex flex-col md:flex-row gap-3">
               {hasMoreFinished && (
                 <button
-                  onClick={() => setFinishedVisibleCount((current) => current + 5)}
+                  onClick={showMoreFinished}
                   className="bg-blue-600 hover:bg-blue-500 px-5 py-3 rounded-2xl font-black w-full md:w-auto"
                 >
                   Ver 5 más
@@ -421,7 +469,7 @@ function PredictionsHistory({
 
               {hasMoreFinished && (
                 <button
-                  onClick={() => setFinishedVisibleCount(finishedHistory.length)}
+                  onClick={showAllFinished}
                   className="bg-slate-800 hover:bg-slate-700 px-5 py-3 rounded-2xl font-black w-full md:w-auto"
                 >
                   Ver todos

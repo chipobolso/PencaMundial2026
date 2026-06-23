@@ -129,12 +129,6 @@ function App() {
     }
 
     loadData()
-
-    const interval = setInterval(() => {
-      loadData()
-    }, 10000)
-
-    return () => clearInterval(interval)
   }, [user])
 
   function handleLogout() {
