@@ -3,6 +3,7 @@ import Login from "./pages/Login"
 import RankingTable from "./components/RankingTable"
 import AdminPanel from "./components/AdminPanel"
 import AdminUsersPanel from "./components/AdminUsersPanel"
+import AdminPredictionLookup from "./components/AdminPredictionLookup"
 import ExtrasPanel from "./components/ExtrasPanel"
 import AdminExtrasPanel from "./components/AdminExtrasPanel"
 import GroupSection from "./components/GroupSection"
@@ -358,6 +359,8 @@ function App() {
         {activeTab === "admin" && user.email === adminEmail && (
           <>
             <AdminUsersPanel />
+
+            <AdminPredictionLookup matches={allMatchesBase} />
 
             <AdminPanel
               matches={allMatchesBase}
