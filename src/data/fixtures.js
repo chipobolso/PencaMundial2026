@@ -113,7 +113,20 @@ export const knockoutStages = {
     { id: "R32-1", group: "16avos", date: "28 Junio 2026", time: "16:00", home: "Sudáfrica", away: "Canadá", stadium: "SoFi Stadium (Inglewood, CA)" },
     { id: "R32-2", group: "16avos", date: "29 Junio 2026", time: "14:00", home: "Brasil", away: "Japón", stadium: "NRG Stadium (Houston, TX)" },
     { id: "R32-3", group: "16avos", date: "29 Junio 2026", time: "17:30", home: "Alemania", away: "Paraguay", stadium: "Gillette Stadium (Foxborough, MA)" },
-    { id: "R32-4", group: "16avos", date: "29 Junio 2026", time: "22:00", home: "Países Bajos", away: "Marruecos", stadium: "Estadio BBVA (Monterrey)" }
+    { id: "R32-4", group: "16avos", date: "29 Junio 2026", time: "22:00", home: "Países Bajos", away: "Marruecos", stadium: "Estadio BBVA (Monterrey)" },
+
+    { id: "R32-5", group: "16avos", date: "30 Junio 2026", time: "14:00", home: "Costa de Marfil", away: "Noruega", stadium: "AT&T Stadium (Arlington, TX)" },
+    { id: "R32-6", group: "16avos", date: "30 Junio 2026", time: "18:00", home: "Francia", away: "Suecia", stadium: "Meadowlands Stadium (East Rutherford, NJ)" },
+    { id: "R32-7", group: "16avos", date: "30 Junio 2026", time: "22:00", home: "México", away: "Ecuador", stadium: "Estadio Banorte (Ciudad de México)" },
+    { id: "R32-8", group: "16avos", date: "1 Julio 2026", time: "13:00", home: "Inglaterra", away: "RD Congo", stadium: "Mercedes-Benz Stadium (Atlanta, GA)" },
+    { id: "R32-9", group: "16avos", date: "1 Julio 2026", time: "17:00", home: "Bélgica", away: "Senegal", stadium: "Lumen Field (Seattle, WA)" },
+    { id: "R32-10", group: "16avos", date: "1 Julio 2026", time: "21:00", home: "Estados Unidos", away: "Bosnia y Herzegovina", stadium: "Levi's Stadium (Santa Clara, CA)" },
+    { id: "R32-11", group: "16avos", date: "2 Julio 2026", time: "16:00", home: "España", away: "Austria", stadium: "SoFi Stadium (Inglewood, CA)" },
+    { id: "R32-12", group: "16avos", date: "2 Julio 2026", time: "20:00", home: "Portugal", away: "Croacia", stadium: "BMO Field (Toronto, ON)" },
+    { id: "R32-13", group: "16avos", date: "3 Julio 2026", time: "00:00", home: "Suiza", away: "Argelia", stadium: "BC Place (Vancouver, BC)" },
+    { id: "R32-14", group: "16avos", date: "3 Julio 2026", time: "15:00", home: "Australia", away: "Egipto", stadium: "AT&T Stadium (Arlington, TX)" },
+    { id: "R32-15", group: "16avos", date: "3 Julio 2026", time: "19:00", home: "Argentina", away: "Cabo Verde", stadium: "Hard Rock Stadium (Miami Gardens, FL)" },
+    { id: "R32-16", group: "16avos", date: "3 Julio 2026", time: "22:30", home: "Colombia", away: "Ghana", stadium: "Arrowhead Stadium (Kansas City, MO)" }
   ],
 
   R16: [],
