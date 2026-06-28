@@ -108,7 +108,24 @@ export const groups = {
   ]
 }
 
-export const allMatchesBase = Object.values(groups).flat()
+export const knockoutStages = {
+  R32: [
+    { id: "R32-1", group: "16avos", date: "28 Junio 2026", time: "16:00", home: "Sudáfrica", away: "Canadá", stadium: "SoFi Stadium (Inglewood, CA)" },
+    { id: "R32-2", group: "16avos", date: "29 Junio 2026", time: "14:00", home: "Brasil", away: "Japón", stadium: "NRG Stadium (Houston, TX)" },
+    { id: "R32-3", group: "16avos", date: "29 Junio 2026", time: "17:30", home: "Alemania", away: "Paraguay", stadium: "Gillette Stadium (Foxborough, MA)" },
+    { id: "R32-4", group: "16avos", date: "29 Junio 2026", time: "22:00", home: "Países Bajos", away: "Marruecos", stadium: "Estadio BBVA (Monterrey)" }
+  ],
+
+  R16: [],
+  QF: [],
+  SF: [],
+  THIRD: [],
+  FINAL: []
+}
+
+export const allGroupMatches = Object.values(groups).flat()
+export const allKnockoutMatches = Object.values(knockoutStages).flat()
+export const allMatchesBase = [...allGroupMatches, ...allKnockoutMatches]
 
 export const teams = [
   "México",

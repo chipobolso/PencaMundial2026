@@ -7,6 +7,7 @@ import AdminPredictionLookup from "./components/AdminPredictionLookup"
 import ExtrasPanel from "./components/ExtrasPanel"
 import AdminExtrasPanel from "./components/AdminExtrasPanel"
 import GroupSection from "./components/GroupSection"
+import KnockoutSection from "./components/KnockoutSection"
 import ProgressPanel from "./components/ProgressPanel"
 import Toast from "./components/Toast"
 import PrizesPanel from "./components/PrizesPanel"
@@ -16,7 +17,7 @@ import { calculateMatchPoints } from "./services/scoring"
 import { getRanking } from "./services/ranking"
 import { getMatchResults } from "./services/matches"
 import { getUserPredictions } from "./services/predictions"
-import { groups, allMatchesBase } from "./data/fixtures"
+import { groups, knockoutStages, allMatchesBase } from "./data/fixtures"
 
 function App() {
   const [user, setUser] = useState(null)
@@ -24,6 +25,7 @@ function App() {
   const [matchResults, setMatchResults] = useState({})
   const [completedPredictions, setCompletedPredictions] = useState(0)
   const [activeTab, setActiveTab] = useState("inicio")
+  const [activeGroup, setActiveGroup] = useState("A")
   const [toastMessage, setToastMessage] = useState("")
   const [userPredictions, setUserPredictions] = useState([])
 
@@ -175,6 +177,12 @@ function App() {
       : "bg-slate-800 text-slate-300 hover:bg-slate-700"
   }
 
+  function groupButtonClass(groupName) {
+    return activeGroup === groupName
+      ? "bg-blue-600 text-white"
+      : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+  }
+
   if (!user) {
     return <Login onLogin={setUser} />
   }
@@ -225,15 +233,33 @@ function App() {
               Pronósticos {pendingUpcomingCount > 0 && `(${pendingUpcomingCount})`}
             </button>
 
-            {Object.keys(groups).map((groupName) => (
-              <button
-                key={groupName}
-                onClick={() => setActiveTab(groupName)}
-                className={`${tabClass(groupName)} px-4 py-2 rounded-xl font-black text-sm`}
-              >
-                Grupo {groupName}
-              </button>
-            ))}
+            <button onClick={() => setActiveTab("faseGrupos")} className={`${tabClass("faseGrupos")} px-4 py-2 rounded-xl font-black text-sm`}>
+              Fase de Grupos
+            </button>
+
+            <button onClick={() => setActiveTab("r32")} className={`${tabClass("r32")} px-4 py-2 rounded-xl font-black text-sm`}>
+              16avos
+            </button>
+
+            <button onClick={() => setActiveTab("r16")} className={`${tabClass("r16")} px-4 py-2 rounded-xl font-black text-sm`}>
+              8vos
+            </button>
+
+            <button onClick={() => setActiveTab("qf")} className={`${tabClass("qf")} px-4 py-2 rounded-xl font-black text-sm`}>
+              4tos
+            </button>
+
+            <button onClick={() => setActiveTab("sf")} className={`${tabClass("sf")} px-4 py-2 rounded-xl font-black text-sm`}>
+              Semifinales
+            </button>
+
+            <button onClick={() => setActiveTab("third")} className={`${tabClass("third")} px-4 py-2 rounded-xl font-black text-sm`}>
+              3er puesto
+            </button>
+
+            <button onClick={() => setActiveTab("final")} className={`${tabClass("final")} px-4 py-2 rounded-xl font-black text-sm`}>
+              Final
+            </button>
 
             {user.email === adminEmail && (
               <button onClick={() => setActiveTab("admin")} className={`${tabClass("admin")} px-4 py-2 rounded-xl font-black text-sm`}>
@@ -342,19 +368,102 @@ function App() {
           />
         )}
 
-        {Object.entries(groups).map(([groupName, matches]) => (
-          activeTab === groupName && (
+        {activeTab === "faseGrupos" && (
+          <div className="space-y-5">
+            <div className="bg-slate-900 rounded-3xl p-5 md:p-6 border border-slate-800 shadow-2xl">
+              <h2 className="text-2xl md:text-4xl font-black mb-4">
+                🌎 Fase de Grupos
+              </h2>
+
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {Object.keys(groups).map((groupName) => (
+                  <button
+                    key={groupName}
+                    onClick={() => setActiveGroup(groupName)}
+                    className={`${groupButtonClass(groupName)} px-4 py-2 rounded-xl font-black text-sm min-w-max`}
+                  >
+                    Grupo {groupName}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <GroupSection
-              key={groupName}
-              groupName={groupName}
-              matches={matches}
+              groupName={activeGroup}
+              matches={groups[activeGroup]}
               matchResults={matchResults}
               user={user}
               calculateMatchPoints={calculateMatchPoints}
               showToast={showToast}
             />
-          )
-        ))}
+          </div>
+        )}
+
+        {activeTab === "r32" && (
+          <KnockoutSection
+            title="🏆 16avos de Final"
+            matches={knockoutStages.R32}
+            matchResults={matchResults}
+            user={user}
+            calculateMatchPoints={calculateMatchPoints}
+            showToast={showToast}
+          />
+        )}
+
+        {activeTab === "r16" && (
+          <KnockoutSection
+            title="🏆 8vos de Final"
+            matches={knockoutStages.R16}
+            matchResults={matchResults}
+            user={user}
+            calculateMatchPoints={calculateMatchPoints}
+            showToast={showToast}
+          />
+        )}
+
+        {activeTab === "qf" && (
+          <KnockoutSection
+            title="🏆 4tos de Final"
+            matches={knockoutStages.QF}
+            matchResults={matchResults}
+            user={user}
+            calculateMatchPoints={calculateMatchPoints}
+            showToast={showToast}
+          />
+        )}
+
+        {activeTab === "sf" && (
+          <KnockoutSection
+            title="🏆 Semifinales"
+            matches={knockoutStages.SF}
+            matchResults={matchResults}
+            user={user}
+            calculateMatchPoints={calculateMatchPoints}
+            showToast={showToast}
+          />
+        )}
+
+        {activeTab === "third" && (
+          <KnockoutSection
+            title="🥉 Tercer Puesto"
+            matches={knockoutStages.THIRD}
+            matchResults={matchResults}
+            user={user}
+            calculateMatchPoints={calculateMatchPoints}
+            showToast={showToast}
+          />
+        )}
+
+        {activeTab === "final" && (
+          <KnockoutSection
+            title="🏆 FINAL"
+            matches={knockoutStages.FINAL}
+            matchResults={matchResults}
+            user={user}
+            calculateMatchPoints={calculateMatchPoints}
+            showToast={showToast}
+          />
+        )}
 
         {activeTab === "admin" && user.email === adminEmail && (
           <>
