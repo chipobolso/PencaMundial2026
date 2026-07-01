@@ -129,7 +129,44 @@ export const knockoutStages = {
     { id: "R32-16", group: "16avos", date: "3 Julio 2026", time: "22:30", home: "Colombia", away: "Ghana", stadium: "Arrowhead Stadium (Kansas City, MO)" }
   ],
 
-  R16: [],
+  R16: [
+  {
+    id: "R16-1",
+    group: "8vos",
+    date: "4 Julio 2026",
+    time: "10:00",
+    home: "Paraguay",
+    away: "Francia",
+    stadium: "Lincoln Financial Field (Filadelfia, PA)"
+  },
+  {
+    id: "R16-2",
+    group: "8vos",
+    date: "4 Julio 2026",
+    time: "14:00",
+    home: "Canadá",
+    away: "Marruecos",
+    stadium: "NRG Stadium (Houston, TX)"
+  },
+  {
+    id: "R16-3",
+    group: "8vos",
+    date: "5 Julio 2026",
+    time: "17:00",
+    home: "Brasil",
+    away: "Noruega",
+    stadium: "Meadowlands Stadium (East Rutherford, NJ)"
+  },
+  {
+    id: "R16-4",
+    group: "8vos",
+    date: "5 Julio 2026",
+    time: "21:00",
+    home: "México",
+    away: "Inglaterra",
+    stadium: "Estadio Banorte (Ciudad de México)"
+  }
+],
   QF: [],
   SF: [],
   THIRD: [],
