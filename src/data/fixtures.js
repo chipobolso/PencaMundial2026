@@ -131,7 +131,7 @@ export const knockoutStages = {
 
   R16: [
   {
-    id: "R16-1",
+    id: "R16-2",
     group: "8vos",
     date: "4 Julio 2026",
     time: "18:00",
@@ -140,7 +140,7 @@ export const knockoutStages = {
     stadium: "Lincoln Financial Field (Filadelfia, PA)"
   },
   {
-    id: "R16-2",
+    id: "R16-1",
     group: "8vos",
     date: "4 Julio 2026",
     time: "14:00",
