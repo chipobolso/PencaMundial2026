@@ -134,7 +134,7 @@ export const knockoutStages = {
     id: "R16-1",
     group: "8vos",
     date: "4 Julio 2026",
-    time: "10:00",
+    time: "18:00",
     home: "Paraguay",
     away: "Francia",
     stadium: "Lincoln Financial Field (Filadelfia, PA)"
@@ -165,6 +165,24 @@ export const knockoutStages = {
     home: "México",
     away: "Inglaterra",
     stadium: "Estadio Banorte (Ciudad de México)"
+  },
+  {
+    id: "R16-5",
+    group: "8vos",
+    date: "6 Julio 2026",
+    time: "16:00",
+    home: "Portugal",
+    away: "España",
+    stadium: "AT&T Stadium (Arlington, TX)"
+  },
+  {
+    id: "R16-6",
+    group: "8vos",
+    date: "6 Julio 2026",
+    time: "21:00",
+    home: "Estados Unidos",
+    away: "Belgica",
+    stadium: "Lumen Field (Seattle, WA)"
   }
 ],
   QF: [],
