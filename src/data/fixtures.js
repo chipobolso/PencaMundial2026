@@ -183,6 +183,24 @@ export const knockoutStages = {
     home: "Estados Unidos",
     away: "Belgica",
     stadium: "Lumen Field (Seattle, WA)"
+  },
+  {
+    id: "R16-7",
+    group: "8vos",
+    date: "7 Julio 2026",
+    time: "13:00",
+    home: "Argentina",
+    away: "Egipto",
+    stadium: "Mercedes-Benz Stadium (Atlanta, GA)"
+  },
+  {
+    id: "R16-8",
+    group: "8vos",
+    date: "7 Julio 2026",
+    time: "17:00",
+    home: "Suiza",
+    away: "Colombia",
+    stadium: "BC Place (Vancouver, BC)"
   }
 ],
   QF: [],
