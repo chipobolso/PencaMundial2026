@@ -203,7 +203,7 @@ export const knockoutStages = {
     stadium: "BC Place (Vancouver, BC)"
   }
 ],
-  QF: [
+QF: [
   {
     id: "QF-1",
     group: "4tos",
@@ -230,6 +230,15 @@ export const knockoutStages = {
     home: "Noruega",
     away: "Inglaterra",
     stadium: "Hard Rock Stadium (Miami Gardens, FL)"
+  },
+  {
+    id: "QF-4",
+    group: "4tos",
+    date: "11 Julio 2026",
+    time: "22:00",
+    home: "Argentina",
+    away: "Suiza",
+    stadium: "Arrowhead Stadium (Kansas City, MO)"
   }
 ],
   SF: [],
