@@ -203,7 +203,35 @@ export const knockoutStages = {
     stadium: "BC Place (Vancouver, BC)"
   }
 ],
-  QF: [],
+  QF: [
+  {
+    id: "QF-1",
+    group: "4tos",
+    date: "9 Julio 2026",
+    time: "17:00",
+    home: "Francia",
+    away: "Marruecos",
+    stadium: "Gillette Stadium (Foxborough, MA)"
+  },
+  {
+    id: "QF-2",
+    group: "4tos",
+    date: "10 Julio 2026",
+    time: "16:00",
+    home: "España",
+    away: "Bélgica",
+    stadium: "SoFi Stadium (Inglewood, CA)"
+  },
+  {
+    id: "QF-3",
+    group: "4tos",
+    date: "11 Julio 2026",
+    time: "18:00",
+    home: "Noruega",
+    away: "Inglaterra",
+    stadium: "Hard Rock Stadium (Miami Gardens, FL)"
+  }
+],
   SF: [],
   THIRD: [],
   FINAL: []
