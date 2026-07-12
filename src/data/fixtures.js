@@ -241,7 +241,26 @@ QF: [
     stadium: "Arrowhead Stadium (Kansas City, MO)"
   }
 ],
-  SF: [],
+  SF: [
+  {
+    id: "SF-1",
+    group: "Semifinales",
+    date: "14 Julio 2026",
+    time: "16:00",
+    home: "Francia",
+    away: "España",
+    stadium: "AT&T Stadium (Arlington, TX)"
+  },
+  {
+    id: "SF-2",
+    group: "Semifinales",
+    date: "15 Julio 2026",
+    time: "16:00",
+    home: "Inglaterra",
+    away: "Argentina",
+    stadium: "Mercedes-Benz Stadium (Atlanta, GA)"
+  }
+],
   THIRD: [],
   FINAL: []
 }
