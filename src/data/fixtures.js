@@ -261,8 +261,27 @@ QF: [
     stadium: "Mercedes-Benz Stadium (Atlanta, GA)"
   }
 ],
-  THIRD: [],
-  FINAL: []
+  THIRD: [
+  {
+    id: "THIRD-1",
+    group: "3er puesto",
+    date: "18 Julio 2026",
+    time: "18:00",
+    home: "Francia",
+    away: "Inglaterra",
+    stadium: "Hard Rock Stadium (Miami Gardens, FL)"
+  }
+  ],
+  FINAL: [{
+    id: "FINAL-1",
+    group: "Final",
+    date: "19 Julio 2026",
+    time: "16:00",
+    home: "España",
+    away: "Argentina",
+    stadium: "MetLife Stadium (East Rutherford, NJ)"
+  }
+]
 }
 
 export const allGroupMatches = Object.values(groups).flat()
