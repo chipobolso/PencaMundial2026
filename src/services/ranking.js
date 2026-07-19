@@ -8,7 +8,7 @@ import {
 } from "firebase/firestore"
 
 import { calculateMatchPoints } from "./scoring"
-import { normalizeText } from "./normalize"
+import { normalizeText, normalizePlayerName } from "./normalize"
 
 export async function getRanking(allMatches) {
   const [
@@ -64,7 +64,7 @@ export async function getRanking(allMatches) {
     : ""
 
   const officialTopScorer = officialExtras
-    ? normalizeText(officialExtras.realAway)
+    ? normalizePlayerName(officialExtras.realAway)
     : ""
 
   const ranking = users.map((user) => {
@@ -95,13 +95,19 @@ export async function getRanking(allMatches) {
 
     if (officialExtras && userExtras) {
       const userChampion = normalizeText(userExtras.champion)
-      const userTopScorer = normalizeText(userExtras.topScorer)
+      const userTopScorer = normalizePlayerName(userExtras.topScorer)
 
-      if (officialChampion && userChampion === officialChampion) {
+      if (
+        officialChampion &&
+        userChampion === officialChampion
+      ) {
         points += 20
       }
 
-      if (officialTopScorer && userTopScorer === officialTopScorer) {
+      if (
+        officialTopScorer &&
+        userTopScorer === officialTopScorer
+      ) {
         points += 15
       }
     }
